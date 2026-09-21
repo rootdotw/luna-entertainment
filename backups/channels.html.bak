@@ -1,0 +1,334 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Channel Explorer & 4K VOD Movies - Luna Stream IPTV</title>
+
+  <link rel="canonical" href="https://lunastream.vip/channels.html">
+
+  <meta name="robots" content="index, follow">
+
+  <meta name="description" content="Explore over 20,000+ live TV channels and 60,000+ VOD movies from the UK, USA, Canada, Europe, and worldwide. Search by category, country, or genre.">
+
+  <meta name="keywords" content="IPTV channel list, live UK channels, USA TV channels, 4K VOD, stream movies online">
+
+  <!-- Favicons & Platform Icons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#080B14">
+  <meta name="msapplication-TileColor" content="#080B14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Luna Stream">
+
+  <!-- OpenGraph Social Sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Luna Stream IPTV">
+  <meta property="og:title" content="Channel Explorer & 4K VOD Movies - Luna Stream IPTV">
+  <meta property="og:description" content="Explore over 20,000+ live TV channels and 60,000+ VOD movies from the UK, USA, Canada, Europe, and worldwide. Search by category, country, or genre.">
+  <meta property="og:url" content="https://lunastream.vip/channels.html">
+  <meta property="og:image" content="https://lunastream.vip/assets/images/og-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_GB">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@LunaStreamVIP">
+  <meta name="twitter:title" content="Channel Explorer & 4K VOD Movies - Luna Stream IPTV">
+  <meta name="twitter:description" content="Explore over 20,000+ live TV channels and 60,000+ VOD movies from the UK, USA, Canada, Europe, and worldwide. Search by category, country, or genre.">
+  <meta name="twitter:image" content="https://lunastream.vip/assets/images/og-preview.png">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BroadcastService",
+  "name": "Luna Stream Global Broadcast & VOD",
+  "serviceType": "IPTV Streaming Service",
+  "provider": {
+    "@type": "Organization",
+    "name": "Luna Stream IPTV"
+  },
+  "areaServed": "Worldwide"
+}
+  </script>
+
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'bg-primary': '#080B14',
+            'bg-secondary': '#0C111D',
+            'bg-card': '#101522',
+            'bg-elevated': '#161D2D',
+            'border-primary': '#263247',
+            brand: {
+              blue: '#3B82F6',
+              'blue-hover': '#2563EB',
+              violet: '#7C3AED',
+              cyan: '#22D3EE',
+              dark: '#080B14',
+              secondary: '#0C111D',
+              card: '#101522',
+              elevated: '#161D2D',
+              border: '#263247'
+            },
+            status: {
+              success: '#22C55E',
+              warning: '#F59E0B',
+              error: '#EF4444',
+              info: '#3B82F6'
+            }
+          },
+          fontFamily: {
+            heading: ['Outfit', 'sans-serif'],
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+    }
+  </script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-[#080B14] text-slate-100 antialiased min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
+
+  <!-- Ambient Glow Background Blobs -->
+  <div class="blob blob-blue w-96 h-96 top-0 left-1/4 -translate-x-1/2"></div>
+  <div class="blob blob-purple w-96 h-96 top-96 right-10"></div>
+
+  <!-- HEADER -->
+  <header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#080B14]/90 backdrop-blur-md border-b border-[#263247]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <a href="index.html" class="flex items-center space-x-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M4 6.75A2.75 2.75 0 016.75 4h10.5A2.75 2.75 0 0120 6.75v10.5A2.75 2.75 0 0117.25 20H6.75A2.75 2.75 0 014 17.25V6.75zM8.5 8.75a.75.75 0 00-.75.75v5a.75.75 0 001.17.616l4.25-2.5a.75.75 0 000-1.232l-4.25-2.5A.75.75 0 008.5 8.75z"/>
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-heading font-extrabold text-xl sm:text-2xl tracking-tight text-white flex items-center gap-1.5">
+              LUNA <span class="text-blue-500">STREAM</span>
+              <span class="pulse-dot ml-1" title="Servers Online"></span>
+            </span>
+            <span class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold -mt-1">Channels & VOD</span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden lg:flex items-center space-x-6 xl:space-x-7 text-sm font-medium text-slate-300">
+          <a href="index.html" class="hover:text-blue-400 transition-colors">Home</a>
+          <a href="pricing.html" class="hover:text-blue-400 transition-colors">Pricing & Plans</a>
+          <a href="sports.html" class="hover:text-blue-400 transition-colors flex items-center gap-1.5 text-amber-300 font-semibold">
+            <span>⚽ Sports Hub</span>
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+            </span>
+          </a>
+          <a href="channels.html" class="text-blue-400 font-bold border-b-2 border-blue-500 pb-1">Channels & VOD</a>
+          <a href="setup.html" class="hover:text-blue-400 transition-colors">Setup Guide</a>
+          <a href="portal.html" class="hover:text-blue-400 transition-colors">Client Portal</a>
+          <a href="contact.html" class="hover:text-blue-400 transition-colors">Support</a>
+        </nav>
+
+        <!-- Right Quick Actions -->
+        <div class="hidden lg:flex items-center space-x-4 ml-6 shrink-0">
+          <a href="checkout.html" class="btn-primary px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider text-white flex items-center gap-2">
+            <span>Order Pass</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </a>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="lg:hidden p-2.5 rounded-xl bg-slate-800/80 text-slate-300 hover:text-blue-400 border border-[#263247]/60 focus:outline-none" aria-label="Open Navigation">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Backdrop -->
+  <div id="drawer-backdrop" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300"></div>
+
+  <!-- Mobile Navigation Drawer -->
+  <div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-slate-950/95 border-l border-[#263247] z-50 transform translate-x-full transition-transform duration-300 ease-in-out p-6 flex flex-col justify-between">
+    <div>
+      <div class="flex items-center justify-between pb-6 border-b border-[#263247]">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-sm">⚡</div>
+          <span class="font-heading font-bold text-lg text-white">Luna Stream</span>
+        </div>
+        <button id="mobile-menu-close" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <nav class="mt-8 flex flex-col space-y-4">
+        <a href="index.html" class="drawer-link text-lg font-semibold text-slate-300 hover:text-blue-400 py-2 border-b border-slate-900">Home</a>
+        <a href="pricing.html" class="drawer-link text-lg font-semibold text-slate-300 hover:text-blue-400 py-2 border-b border-slate-900">Pricing & Plans</a>
+        <a href="sports.html" class="drawer-link text-lg font-semibold text-amber-300 hover:text-amber-200 py-2 border-b border-slate-900">⚽ Live Sports Hub</a>
+        <a href="channels.html" class="drawer-link text-lg font-semibold text-cyan-400 py-2 border-b border-slate-900">Channel Explorer</a>
+        <a href="setup.html" class="drawer-link text-lg font-semibold text-slate-300 hover:text-blue-400 py-2 border-b border-slate-900">Setup Guide</a>
+        <a href="portal.html" class="drawer-link text-lg font-semibold text-slate-300 hover:text-blue-400 py-2 border-b border-slate-900">Client Portal</a>
+        <a href="contact.html" class="drawer-link text-lg font-semibold text-slate-300 hover:text-blue-400 py-2 border-b border-slate-900">Support</a>
+      </nav>
+    </div>
+
+    <div class="space-y-3 pt-6 border-t border-[#263247]">
+      <button class="open-trial-modal w-full py-3 rounded-xl border border-cyan-500/40 text-cyan-400 font-bold text-sm bg-blue-600/10">
+        ⚡ Claim 24H Free Trial
+      </button>
+      <a href="checkout.html" class="btn-primary text-white w-full py-3 rounded-xl text-center block text-sm font-extrabold text-white">
+        Get Instant Pass
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-grow pt-28 sm:pt-36 pb-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Page Header -->
+      <div class="text-center max-w-3xl mx-auto mb-10">
+        <span class="text-xs font-extrabold uppercase tracking-widest text-blue-400">Content Directory</span>
+        <h1 class="text-3xl sm:text-5xl font-extrabold font-heading text-white mt-2">
+          Channel & VOD Explorer
+        </h1>
+        <p class="text-slate-400 text-xs sm:text-sm mt-3">
+          Search over <strong>20,000+ live international channels</strong> and <strong>60,000+ 4K movies & series</strong>. Updated daily.
+        </p>
+      </div>
+
+      <!-- Real-Time Search Bar -->
+      <div class="max-w-2xl mx-auto mb-8">
+        <div class="relative">
+          <input type="text" id="channel-search-input" placeholder="Search channels (e.g. Sky Sports, ESPN, UFC, HBO, BBC, French, Arabic)..." class="w-full bg-[#101522] border border-[#263247] rounded-2xl px-5 py-4 pl-12 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 shadow-xl">
+          <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg">
+            🔍
+          </div>
+        </div>
+        <div class="flex items-center justify-between text-xs text-slate-400 mt-2.5 px-2">
+          <span id="channel-match-count">Loading channels database...</span>
+          <span class="text-cyan-400 font-medium">Native 4K & 60FPS</span>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="flex flex-wrap items-center justify-center gap-2 mb-10">
+        <button class="channel-cat-pill active px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-cyan-500/30 transition-all" data-cat="all">All Categories</button>
+        <button class="channel-cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-[#101522] border border-[#263247] text-slate-300 hover:text-white hover:border-blue-500/50 transition-all" data-cat="sports">⚽ Sports 4K UHD</button>
+        <button class="channel-cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-[#101522] border border-[#263247] text-slate-300 hover:text-white hover:border-blue-500/50 transition-all" data-cat="ppv">🥊 PPV & Events</button>
+        <button class="channel-cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-[#101522] border border-[#263247] text-slate-300 hover:text-white hover:border-blue-500/50 transition-all" data-cat="usa">🇺🇸 USA & Canada</button>
+        <button class="channel-cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-[#101522] border border-[#263247] text-slate-300 hover:text-white hover:border-blue-500/50 transition-all" data-cat="uk">🇬🇧 UK & Ireland</button>
+        <button class="channel-cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-[#101522] border border-[#263247] text-slate-300 hover:text-white hover:border-blue-500/50 transition-all" data-cat="international">🌍 International</button>
+        <button class="channel-cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-[#101522] border border-[#263247] text-slate-300 hover:text-white hover:border-blue-500/50 transition-all" data-cat="vod">🍿 4K VOD Movies</button>
+        <button class="channel-cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-[#101522] border border-[#263247] text-slate-300 hover:text-white hover:border-blue-500/50 transition-all" data-cat="kids">🏰 Kids & Family</button>
+      </div>
+
+      <!-- Channel Grid Output -->
+      <div id="channels-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-h-[300px]">
+        <!-- Channels will be injected here via channels.js -->
+      </div>
+
+      <!-- CTA Bottom Card -->
+      <div class="mt-16 glass-panel rounded-3xl p-8 sm:p-12 border border-[#263247] bg-[#101522] text-center">
+        <h3 class="text-2xl sm:text-3xl font-extrabold font-heading text-white">
+          Can't find a specific channel or sport?
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-300 mt-2 max-w-xl mx-auto">
+          Our master playlist contains over 20,000 channels across 80+ countries. Ask our WhatsApp support team to verify your favorite local feed!
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-4 mt-6">
+          <a href="https://wa.me/447413469398?text=Hello+Luna+Stream!+Does+your+playlist+include+..." target="_blank" class="btn-whatsapp px-6 py-3 rounded-xl text-xs font-bold flex items-center gap-2">
+            <span>Ask Channel Request on WhatsApp</span>
+          </a>
+          <a href="checkout.html" class="btn-primary text-white px-6 py-3 rounded-xl text-xs font-extrabold text-white">
+            Get Full Access Pass
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-[#0C111D] border-t border-[#263247] pt-16 pb-24 md:pb-12 text-slate-400 text-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-600 gap-4">
+      <p>&copy; 2026 Luna Stream IPTV. All rights reserved.</p>
+      <div class="flex flex-wrap items-center gap-3">
+        <a href="portal.html" class="hover:text-blue-400 transition-colors">Client Portal</a>
+        <span>•</span>
+        <a href="pricing.html" class="hover:text-blue-400 transition-colors">Pricing</a>
+        <span>•</span>
+        <a href="terms.html" class="hover:text-blue-400 transition-colors">Terms</a>
+        <span>•</span>
+        <a href="privacy.html" class="hover:text-blue-400 transition-colors">Privacy</a>
+        <span>•</span>
+        <a href="refund.html" class="hover:text-blue-400 transition-colors">Refund Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Free Trial Modal -->
+  <div id="trial-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div id="trial-backdrop" class="fixed inset-0 bg-black/80 backdrop-blur-sm"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-2xl max-w-md w-full p-6 sm:p-8 border border-[#263247] shadow-2xl z-10">
+      <div class="flex items-center justify-between pb-4 border-b border-[#263247]">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">⚡</span>
+          <h3 class="font-heading font-bold text-lg text-white">Claim 24-Hour Free Trial</h3>
+        </div>
+        <button id="close-trial-modal" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="trial-form" class="mt-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Delivery Email Address</label>
+          <input type="email" required placeholder="your.name@example.com" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Your Streaming Device</label>
+          <select name="device" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+            <option value="Amazon FireStick">Amazon FireStick 4K / Lite</option>
+            <option value="Smart TV (Samsung/LG)">Samsung / LG Smart TV</option>
+            <option value="Android TV / Box">Android TV Box / Google TV</option>
+            <option value="Apple TV / iOS">Apple TV / iPhone / iPad</option>
+            <option value="MAG Box">MAG Box / Stalker</option>
+            <option value="Windows / Mac">Windows PC / MacOS</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary text-white w-full py-3 rounded-xl text-xs uppercase tracking-wider font-extrabold text-white mt-2">
+          Generate Trial Line
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/tracker.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/channels.js"></script>
+</body>
+</html>
+
+

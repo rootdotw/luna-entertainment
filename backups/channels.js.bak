@@ -1,0 +1,167 @@
+﻿/**
+ * Luna Stream IPTV - Channel Explorer & Real-Time Search Logic
+ */
+
+const CHANNEL_DATABASE = [
+  // 4K Live Sports
+  { name: "Sky Sports Premier League 4K", category: "sports", quality: "4K UHD 60FPS", country: "UK", epg: true, icon: "⚽" },
+  { name: "Sky Sports Main Event UHD", category: "sports", quality: "4K UHD 60FPS", country: "UK", epg: true, icon: "🏆" },
+  { name: "TNT Sports 1 Ultimate 4K", category: "sports", quality: "4K UHD HDR", country: "UK", epg: true, icon: "🥊" },
+  { name: "TNT Sports 2 HD / 3 HD / 4 HD", category: "sports", quality: "FHD 1080p", country: "UK", epg: true, icon: "🏉" },
+  { name: "ESPN USA & ESPN 2 4K", category: "sports", quality: "4K UHD", country: "USA", epg: true, icon: "🏀" },
+  { name: "Fox Sports 1 & 2 HD (FS1/FS2)", category: "sports", quality: "FHD 60FPS", country: "USA", epg: true, icon: "⚾" },
+  { name: "NBC Sports & Peacock Live", category: "sports", quality: "4K UHD", country: "USA", epg: true, icon: "🏎️" },
+  { name: "beIN Sports 1-8 Premium 4K", category: "sports", quality: "4K UHD", country: "Global", epg: true, icon: "⚽" },
+  { name: "SuperSport Grandstand & PSL 4K", category: "sports", quality: "4K UHD", country: "South Africa", epg: true, icon: "🏉" },
+  { name: "DAZN 1 to 4 Bar HD (LaLiga/Serie A)", category: "sports", quality: "FHD 60FPS", country: "Europe", epg: true, icon: "🥊" },
+  { name: "Willow Cricket HD & Star Sports 4K", category: "sports", quality: "4K UHD", country: "Asia/US", epg: true, icon: "🏏" },
+  { name: "Formula 1 TV Pro UHD (On-Board Cams)", category: "sports", quality: "4K 60FPS", country: "Global", epg: true, icon: "🏎️" },
+
+  // Pay-Per-View (PPV)
+  { name: "UFC PPV Main Card 4K (Fight Pass)", category: "ppv", quality: "4K UHD", country: "Global", epg: true, icon: "🥊" },
+  { name: "WWE WrestleMania / Royal Rumble PPV", category: "ppv", quality: "FHD 60FPS", country: "USA", epg: true, icon: "🤼" },
+  { name: "DAZN PPV Boxing Championship", category: "ppv", quality: "4K UHD", country: "Global", epg: true, icon: "🥊" },
+  { name: "Premier League Saturday 3PM Blackouts", category: "ppv", quality: "FHD 60FPS", country: "UK", epg: true, icon: "⚽" },
+  { name: "NFL Sunday Ticket & RedZone Live", category: "ppv", quality: "FHD 60FPS", country: "USA", epg: true, icon: "🏈" },
+  { name: "NBA League Pass (Home/Away Feeds)", category: "ppv", quality: "FHD 60FPS", country: "USA", epg: true, icon: "🏀" },
+
+  // USA Premium & Entertainment
+  { name: "HBO Max East / West HD", category: "usa", quality: "4K UHD", country: "USA", epg: true, icon: "🎬" },
+  { name: "Showtime East / West HD", category: "usa", quality: "FHD 1080p", country: "USA", epg: true, icon: "🎥" },
+  { name: "Starz Cinema & Comedy HD", category: "usa", quality: "FHD 1080p", country: "USA", epg: true, icon: "🍿" },
+  { name: "Cinemax East / West HD", category: "usa", quality: "FHD 1080p", country: "USA", epg: true, icon: "🎞️" },
+  { name: "ABC / CBS / NBC / FOX 4K Locals", category: "usa", quality: "4K UHD", country: "USA", epg: true, icon: "📡" },
+  { name: "Discovery Channel & Animal Planet 4K", category: "usa", quality: "4K UHD", country: "USA", epg: true, icon: "🦁" },
+  { name: "National Geographic Wild HD", category: "usa", quality: "FHD 1080p", country: "USA", epg: true, icon: "🌍" },
+  { name: "AMC, FX, USA Network, TBS, TNT", category: "usa", quality: "FHD 1080p", country: "USA", epg: true, icon: "📺" },
+
+  // UK & Ireland
+  { name: "BBC One & BBC Two HD", category: "uk", quality: "FHD 1080p", country: "UK", epg: true, icon: "🇬🇧" },
+  { name: "ITV 1, ITV 2, ITV 3, ITV 4 HD", category: "uk", quality: "FHD 1080p", country: "UK", epg: true, icon: "🇬🇧" },
+  { name: "Channel 4 & Channel 5 HD", category: "uk", quality: "FHD 1080p", country: "UK", epg: true, icon: "🇬🇧" },
+  { name: "Sky Cinema Premiere / Hits / Action UHD", category: "uk", quality: "4K UHD", country: "UK", epg: true, icon: "🎬" },
+  { name: "Sky Atlantic UHD & Sky Documentaries", category: "uk", quality: "4K UHD", country: "UK", epg: true, icon: "📺" },
+  { name: "RTÉ One & RTÉ2 HD Ireland", category: "uk", quality: "FHD 1080p", country: "Ireland", epg: true, icon: "🇮🇪" },
+
+  // International (Canada, Europe, Arabic, Latino)
+  { name: "TSN 1-5 & Sportsnet Ontario 4K", category: "international", quality: "4K UHD", country: "Canada", epg: true, icon: "🇨🇦" },
+  { name: "Canal+ Sport 360 & Foot 4K", category: "international", quality: "4K UHD", country: "France", epg: true, icon: "🇫🇷" },
+  { name: "Sky Sport Bundesliga 1-10 UHD", category: "international", quality: "4K UHD", country: "Germany", epg: true, icon: "🇩🇪" },
+  { name: "Movistar LaLiga EA Sports UHD", category: "international", quality: "4K UHD", country: "Spain", epg: true, icon: "🇪🇸" },
+  { name: "Sky Sport Calcio & Serie A 4K", category: "international", quality: "4K UHD", country: "Italy", epg: true, icon: "🇮🇹" },
+  { name: "MBC 1-5 HD & Shahid VIP Originals", category: "international", quality: "FHD 1080p", country: "Arabic", epg: true, icon: "🌙" },
+  { name: "OSN Movies Premiere & Action 4K", category: "international", quality: "4K UHD", country: "Arabic", epg: true, icon: "⭐" },
+  { name: "Telemundo & Univision East HD", category: "international", quality: "FHD 1080p", country: "Latino", epg: true, icon: "🇲🇽" },
+
+  // Kids & Animation
+  { name: "Disney Channel & Disney Junior HD", category: "kids", quality: "FHD 1080p", country: "USA/UK", epg: true, icon: "🏰" },
+  { name: "Cartoon Network & Boomerang HD", category: "kids", quality: "FHD 1080p", country: "USA/UK", epg: true, icon: "👾" },
+  { name: "Nickelodeon & Nick Jr. HD", category: "kids", quality: "FHD 1080p", country: "USA/UK", epg: true, icon: "🧽" },
+
+  // Movies & VOD Series (60,000+ Titles)
+  { name: "Cinema 2026 4K VOD Releases", category: "vod", quality: "4K HDR Dolby Vision", country: "VOD", epg: false, icon: "🍿" },
+  { name: "Netflix Series 4K Multi-Audio", category: "vod", quality: "4K UHD Dolby Atmos", country: "VOD", epg: false, icon: "🔴" },
+  { name: "HBO Max & Max Originals VOD", category: "vod", quality: "4K UHD HDR", country: "VOD", epg: false, icon: "💜" },
+  { name: "Amazon Prime Cinema 4K VOD", category: "vod", quality: "4K UHD", country: "VOD", epg: false, icon: "📦" },
+  { name: "Apple TV+ 4K HDR Series Collection", category: "vod", quality: "4K Dolby Vision", country: "VOD", epg: false, icon: "🍏" },
+  { name: "Disney+ & Marvel Cinematic VOD", category: "vod", quality: "4K IMAX Enhanced", country: "VOD", epg: false, icon: "🦸" }
+];
+
+let activeCategory = 'all';
+let searchQuery = '';
+
+document.addEventListener('DOMContentLoaded', () => {
+  initChannelExplorer();
+});
+
+function initChannelExplorer() {
+  const container = document.getElementById('channels-grid');
+  const searchInput = document.getElementById('channel-search-input');
+  const categoryPills = document.querySelectorAll('.channel-cat-pill');
+  const resultCounter = document.getElementById('channel-match-count');
+
+  if (!container) return;
+
+  function renderChannels() {
+    const filtered = CHANNEL_DATABASE.filter(item => {
+      const matchesCat = activeCategory === 'all' || item.category === activeCategory;
+      const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            item.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            item.category.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCat && matchesSearch;
+    });
+
+    if (resultCounter) {
+      resultCounter.textContent = `${filtered.length} Channels / Streams Displayed (Sample of 20,000+)`;
+    }
+
+    if (filtered.length === 0) {
+      const emptyMsg = document.createElement('p');
+      emptyMsg.className = 'text-sm text-gray-400 text-center py-8';
+      const strong = document.createElement('strong');
+      strong.textContent = searchQuery;
+      emptyMsg.append('We couldn\\'t find matches for "', strong, '". Our database has over 20,000+ live streams.');
+      container.innerHTML = '';
+      container.appendChild(emptyMsg);
+      return;
+    }
+
+    container.innerHTML = filtered.map(ch => `
+      <div class="glass-panel rounded-xl p-4 flex items-center justify-between border border-[#263247] hover:border-blue-500/50 bg-[#101522] transition-all duration-200 group">
+        <div class="flex items-center space-x-3.5">
+          <div class="w-10 h-10 rounded-lg bg-[#0C111D] border border-[#263247] flex items-center justify-center text-xl flex-shrink-0 group-hover:scale-110 transition-transform">
+            ${ch.icon}
+          </div>
+          <div>
+            <div class="font-semibold text-white text-sm group-hover:text-blue-400 transition-colors flex items-center gap-2">
+              ${ch.name}
+              ${ch.epg ? '<span class="px-1.5 py-0.5 text-[10px] bg-slate-800 text-slate-400 rounded font-mono">EPG</span>' : ''}
+            </div>
+            <div class="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+              <span>📍 ${ch.country}</span>
+              <span class="text-slate-600">•</span>
+              <span class="text-[#22D3EE] font-medium">${ch.quality}</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center px-2 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
+            LIVE
+          </span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Search input event (debounced 200ms)
+  if (searchInput) {
+    let debounceTimer = null;
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        searchQuery = e.target.value.trim();
+        renderChannels();
+      }, 200);
+    });
+  }
+
+  // Category pill event
+  categoryPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      categoryPills.forEach(p => {
+        p.classList.remove('bg-blue-600', 'text-white', 'font-bold', 'shadow-sm');
+        p.classList.add('bg-[#101522] border border-[#263247]', 'text-slate-300');
+      });
+
+      pill.classList.remove('bg-[#101522] border border-[#263247]', 'text-slate-300');
+      pill.classList.add('bg-blue-600', 'text-white', 'font-bold', 'shadow-sm');
+
+      activeCategory = pill.getAttribute('data-cat') || 'all';
+      renderChannels();
+    });
+  });
+
+  renderChannels();
+}
+
