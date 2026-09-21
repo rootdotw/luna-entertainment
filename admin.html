@@ -1,0 +1,2022 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Admin Management Dashboard - Luna Stream IPTV</title>
+
+  <link rel="canonical" href="https://lunaentertainment.online/admin.html">
+
+  <meta name="robots" content="noindex, nofollow">
+
+  <meta name="description" content="Master administrative control console for Luna Stream IPTV business operations.">
+
+  <!-- Favicons & Platform Icons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#080B14">
+  <meta name="msapplication-TileColor" content="#080B14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Luna Stream">
+
+  <!-- OpenGraph Social Sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Luna Stream IPTV">
+  <meta property="og:title" content="Admin Management Dashboard - Luna Stream IPTV">
+  <meta property="og:description" content="Master administrative control console for Luna Stream IPTV business operations.">
+  <meta property="og:url" content="https://lunaentertainment.online/admin.html">
+  <meta property="og:image" content="https://lunaentertainment.online/assets/images/og-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_GB">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@LunaStreamVIP">
+  <meta name="twitter:title" content="Admin Management Dashboard - Luna Stream IPTV">
+  <meta name="twitter:description" content="Master administrative control console for Luna Stream IPTV business operations.">
+  <meta name="twitter:image" content="https://lunaentertainment.online/assets/images/og-preview.png">
+
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'bg-primary': '#080B14',
+            'bg-secondary': '#0C111D',
+            'bg-card': '#101522',
+            'bg-elevated': '#161D2D',
+            'border-primary': '#263247',
+            brand: {
+              blue: '#3B82F6',
+              'blue-hover': '#2563EB',
+              violet: '#7C3AED',
+              cyan: '#22D3EE',
+              dark: '#080B14',
+              secondary: '#0C111D',
+              card: '#101522',
+              elevated: '#161D2D',
+              border: '#263247'
+            },
+            status: {
+              success: '#22C55E',
+              warning: '#F59E0B',
+              error: '#EF4444',
+              info: '#3B82F6'
+            }
+          },
+          fontFamily: {
+            heading: ['Outfit', 'sans-serif'],
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+    }
+  </script>
+
+  <!-- Custom CSS -->
+    <!-- Google Fonts Preconnect & Stylesheet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  
+</head>
+<body class="bg-[#080B14] text-slate-100 antialiased min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
+
+  <!-- ==========================================
+       AUTHENTICATION LOGIN GATE MODAL
+       ========================================== -->
+  <div id="admin-auth-gate" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#101522]/95 backdrop-blur-xl">
+    <div class="glass-panel rounded-3xl max-w-md w-full p-8 border border-[#263247] bg-[#101522] text-center shadow-2xl relative">
+      <div class="w-16 h-16 rounded-2xl bg-blue-600/10 text-blue-400 flex items-center justify-center text-3xl mx-auto mb-4 border border-blue-500/25">
+        🔐
+      </div>
+      <h2 class="font-heading font-extrabold text-2xl text-white">Luna Stream Admin Gate</h2>
+      <p class="text-xs text-slate-400 mt-2 mb-6">Enter master administrative password to unlock subscriber & business management.</p>
+
+      <form id="admin-login-form" class="space-y-4">
+        <div>
+          <input type="password" id="admin-password-input" required placeholder="Master Password" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-3 text-sm text-center text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono">
+        </div>
+        <button type="submit" id="btn-admin-login" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white w-full py-3 rounded-xl text-xs uppercase font-extrabold text-white">
+          Unlock Dashboard
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       AUTHENTICATED DASHBOARD ROOT
+       ========================================== -->
+  <div id="admin-dashboard-root" class="flex-grow hidden flex flex-col min-h-screen">
+    
+    <!-- Top Header Bar -->
+    <header class="bg-[#080B14]/92 border-b border-[#263247] sticky top-0 z-40 backdrop-blur-md">
+      <div class="w-full px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 gap-4">
+          
+          <!-- Left: Brand & Mobile Sidebar Toggle -->
+          <div class="flex items-center space-x-3 shrink-0">
+            <button id="btn-toggle-sidebar" class="md:hidden text-slate-400 hover:text-white p-2 rounded-lg bg-[#0C111D] border border-[#263247]" aria-label="Toggle navigation sidebar">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold text-white text-sm">
+              ⚡
+            </div>
+            <span class="font-heading font-extrabold text-lg text-white hidden sm:inline">LUNA <span class="text-blue-500">STREAM</span> <span class="text-[10px] px-2 py-0.5 rounded bg-blue-600/10 text-blue-400 border border-blue-500/25 ml-1">ADMIN v2.0</span></span>
+          </div>
+
+          <!-- Middle: Global Search -->
+          <div class="flex-1 max-w-md hidden md:block">
+            <div class="relative">
+              <input type="text" id="global-search-input" placeholder="Quick search orders, customers, subscriptions..." class="w-full bg-[#0C111D]/90 border border-[#263247] rounded-xl px-4 py-2 pl-9 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+              <span class="absolute left-3 top-2.5 text-slate-500 text-xs">🔍</span>
+            </div>
+          </div>
+
+          <!-- Right: Quick Actions & Navigation -->
+          <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
+            <!-- Live Visitor Radar Badge -->
+            <div id="header-visitor-radar" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#0C111D] border border-[#263247] text-xs">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span class="text-slate-400">Live:</span>
+              <span id="header-active-count" class="font-bold text-emerald-400 font-mono">0</span>
+              <span class="text-slate-500 text-[10px]">online</span>
+            </div>
+
+            <!-- Audio Alerts Toggle -->
+            <button id="btn-sound-toggle" type="button" onclick="toggleVisitorAudio()" title="Toggle Sound Notifications" class="px-2.5 py-1.5 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] text-xs font-semibold text-slate-300 flex items-center gap-1.5 transition-all cursor-pointer">
+              <span id="sound-icon">🔊</span>
+              <span id="sound-label" class="hidden xl:inline">Sound: ON</span>
+            </button>
+            <button id="btn-quick-new-order" class="btn-primary px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 flex items-center gap-1.5 shadow-sm">
+              <span>+ New Order</span>
+            </button>
+            <button id="btn-quick-new-customer" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#161D2D] text-slate-300 border border-[#263247] hover:bg-[#101522] hover:text-white flex items-center gap-1.5">
+              <span>+ Customer</span>
+            </button>
+            <button id="btn-refresh-data" class="text-xs font-semibold text-blue-400 hover:text-slate-400 flex items-center gap-1.5 bg-[#0C111D] border border-[#263247] px-3 py-1.5 rounded-lg hover:border-blue-500/40">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span class="hidden sm:inline">Refresh</span>
+            </button>
+            <a href="portal.html" target="_blank" class="text-xs text-slate-400 hover:text-blue-400 hidden lg:flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#0C111D] border border-[#263247]">
+              <span>Client Portal ↗</span>
+            </a>
+            <button id="btn-admin-logout" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-[#263247]">
+              Log Out
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Layout with Sidebar -->
+    <div class="flex flex-1 w-full overflow-hidden">
+      
+      <!-- Collapsible Sidebar -->
+      <aside id="admin-sidebar" class="w-64 bg-[#0C111D] border-r border-[#263247] shrink-0 flex flex-col justify-between hidden md:flex transition-all duration-300 z-30">
+        <div class="p-4 space-y-1 overflow-y-auto">
+          
+          <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">Overview</div>
+          
+          <a href="#dashboard" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-[#F8FAFC] bg-blue-600/10 border-l-4 border-[#3B82F6] transition-colors" data-tab="dashboard">
+            <span class="text-base">📊</span>
+            <span>Dashboard</span>
+          </a>
+
+          <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mt-4 mb-2">Subscriber Ops</div>
+          
+          <a href="#orders" class="sidebar-link flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#0C111D] transition-colors" data-tab="orders">
+            <div class="flex items-center gap-3">
+              <span class="text-base">📦</span>
+              <span>Orders</span>
+            </div>
+            <span id="badge-count-orders" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono">0</span>
+          </a>
+
+          <a href="#customers" class="sidebar-link flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#0C111D] transition-colors" data-tab="customers">
+            <div class="flex items-center gap-3">
+              <span class="text-base">👥</span>
+              <span>Customers (CRM)</span>
+            </div>
+            <span id="badge-count-customers" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono">0</span>
+          </a>
+
+          <a href="#subscriptions" class="sidebar-link flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#0C111D] transition-colors" data-tab="subscriptions">
+            <div class="flex items-center gap-3">
+              <span class="text-base">📋</span>
+              <span>Subscriptions</span>
+            </div>
+            <span id="badge-count-subs" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono">0</span>
+          </a>
+
+          <a href="#payments" class="sidebar-link flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#0C111D] transition-colors" data-tab="payments">
+            <div class="flex items-center gap-3">
+              <span class="text-base">💳</span>
+              <span>Payments</span>
+            </div>
+            <span id="badge-count-payments" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono">0</span>
+          </a>
+
+          <a href="#coupons" class="sidebar-link flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#0C111D] transition-colors" data-tab="coupons">
+            <div class="flex items-center gap-3">
+              <span class="text-base">🎯</span>
+              <span>Coupons</span>
+            </div>
+            <span id="badge-count-coupons" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono">0</span>
+          </a>
+
+          <a href="#pricing" class="sidebar-link flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#0C111D] transition-colors" data-tab="pricing">
+            <div class="flex items-center gap-3">
+              <span class="text-base">🏷️</span>
+              <span>Plans & Pricing</span>
+            </div>
+            <span id="badge-count-pricing" class="text-[10px] px-2 py-0.5 rounded-full bg-blue-600/20 text-blue-400 border border-blue-500/30 font-mono">3 Plans</span>
+          </a>
+
+          <a href="#trials" class="sidebar-link flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#0C111D] transition-colors" data-tab="trials">
+            <div class="flex items-center gap-3">
+              <span class="text-base">⚡</span>
+              <span>24H Trials</span>
+            </div>
+            <span id="badge-count-trials" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono">0</span>
+          </a>
+
+          <a href="#tickets" class="sidebar-link flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#0C111D] transition-colors" data-tab="tickets">
+            <div class="flex items-center gap-3">
+              <span class="text-base">🎫</span>
+              <span>Support Tickets</span>
+            </div>
+            <span id="badge-count-tickets" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono">0</span>
+          </a>
+
+          <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mt-4 mb-2">Growth & Leads</div>
+          
+          <a href="#leads" class="sidebar-link flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#0C111D] transition-colors" data-tab="leads">
+            <div class="flex items-center gap-3">
+              <span class="text-base">🎯</span>
+              <span>WhatsApp Leads</span>
+            </div>
+            <span id="badge-count-leads" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono">0</span>
+          </a>
+
+          <a href="#visitors" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#0C111D] transition-colors" data-tab="visitors">
+            <span class="text-base">📊</span>
+            <span>Visitor Stream</span>
+          </a>
+
+          <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mt-4 mb-2">System</div>
+
+          <a href="#settings" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-[#0C111D] transition-colors" data-tab="settings">
+            <span class="text-base">⚙️</span>
+            <span>Settings & Security</span>
+          </a>
+
+        </div>
+
+        <div class="p-4 border-t border-[#263247] text-xs text-slate-500">
+          <div class="flex items-center justify-between">
+            <span>Luna Stream Server</span>
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          </div>
+          <p class="text-[10px] text-slate-600 mt-1">Status: Online (Port 8081)</p>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-8 bg-[#080B14]">
+        
+        <!-- ==========================================
+             TAB 1: DASHBOARD & TODAY'S WORK
+             ========================================== -->
+        <div id="dashboard" class="scroll-mt-20"></div>
+        <div id="tab-content-dashboard" class="admin-tab-content block space-y-6">
+          
+          <!-- KPI Stats Grid -->
+          <div class="grid grid-cols-2 lg:grid-cols-6 gap-3.5">
+            <div class="glass-panel rounded-2xl p-4 border border-[#263247]">
+              <span class="text-[11px] font-semibold text-slate-400 block mb-1">Gross Revenue</span>
+              <div class="text-xl sm:text-2xl font-black text-blue-400 font-heading" id="stat-revenue">$0.00</div>
+              <span class="text-[10px] text-slate-400 mt-1 block">Retail Subscriptions</span>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-4 border border-[#263247]">
+              <span class="text-[11px] font-semibold text-slate-400 block mb-1">Supplier Cost</span>
+              <div class="text-xl sm:text-2xl font-black text-amber-400 font-heading" id="stat-supplier-cost">$0.00</div>
+              <span class="text-[10px] text-slate-400 mt-1 block" id="stat-credit-rate">@ £2.50 / credit</span>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-4 border border-emerald-500/30 bg-emerald-950/10">
+              <span class="text-[11px] font-semibold text-emerald-300 block mb-1">Net Pure Profit</span>
+              <div class="text-xl sm:text-2xl font-black text-emerald-400 font-heading" id="stat-net-profit">$0.00</div>
+              <span class="text-[10px] text-emerald-300 font-bold mt-1 block" id="stat-margin">0% Margin</span>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-4 border border-[#263247]">
+              <span class="text-[11px] font-semibold text-slate-400 block mb-1">Active Lines</span>
+              <div class="text-xl sm:text-2xl font-black text-white font-heading" id="stat-active">0</div>
+              <span class="text-[10px] text-emerald-400 mt-1 block">Streaming in 4K</span>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-4 border border-[#263247]">
+              <span class="text-[11px] font-semibold text-slate-400 block mb-1">Expiring (7 Days)</span>
+              <div class="text-xl sm:text-2xl font-black text-amber-400 font-heading" id="stat-expiring">0</div>
+              <span class="text-[10px] text-amber-300/80 mt-1 block">Renewal Candidates</span>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-4 border border-[#263247]">
+              <span class="text-[11px] font-semibold text-slate-400 block mb-1">Traffic / Leads</span>
+              <div class="text-xl sm:text-2xl font-black text-white font-heading">
+                <span id="stat-visitors">0</span> <span class="text-xs text-slate-400 font-normal">/ <span id="stat-leads" class="text-blue-400 font-bold">0</span></span>
+              </div>
+              <span class="text-[10px] text-slate-400 mt-1 block"><span id="stat-conversion">0%</span> Conv Rate</span>
+            </div>
+          </div>
+
+          <!-- Today's Action Hub -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-heading font-bold text-white flex items-center gap-2">
+                <span>⚡ Today's Action Hub</span>
+                <span class="text-xs font-normal text-slate-400">(Prioritized tasks requiring admin attention)</span>
+              </h3>
+            </div>
+            
+            <div id="action-hub-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              <!-- Dynamically populated via JS -->
+            </div>
+          </div>
+
+                    <!-- Real-Time Visitor Radar (Live Site Monitoring & Sound) -->
+          <div id="live-visitor-radar-card" class="glass-panel rounded-2xl p-5 border border-blue-500/30 bg-[#0C111D]/80 space-y-4 shadow-xl">
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#263247]">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-base">
+                  📡
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="font-heading font-bold text-white text-sm">Real-Time Customer Radar</h3>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> LIVE
+                    </span>
+                  </div>
+                  <p class="text-[11px] text-slate-400">Shows exactly where customers are on your site with audible alerts on visits &amp; page transitions.</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <span id="radar-active-counter" class="text-xs font-mono font-bold text-blue-400 px-3 py-1.5 rounded-xl bg-[#161D2D] border border-[#263247]">0 Active Visitors</span>
+                <button type="button" onclick="testChimeSound()" class="px-3 py-1.5 text-xs font-bold bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-blue-300 rounded-xl border border-blue-500/40 flex items-center gap-1.5 transition-all">
+                  <span>🔔 Test Chime</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Active Visitors List / Radar Display -->
+            <div id="radar-active-visitors-list" class="space-y-2">
+              <div class="text-center py-6 text-slate-500 text-xs flex flex-col items-center justify-center gap-2">
+                <span class="text-xl">🛰️</span>
+                <span>Radar active &amp; listening... Open <a href="index.html" target="_blank" class="text-blue-400 underline font-semibold">Luna Stream</a> in another tab or device to test live visitor tracking.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity & Quick Controls -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Quick Fulfillment Pending Orders -->
+            <div class="lg:col-span-2 glass-panel rounded-2xl p-5 border border-[#263247] space-y-4">
+              <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+                <h4 class="font-heading font-bold text-white text-sm flex items-center gap-2">
+                  <span>📦 Orders Awaiting Fulfillment</span>
+                </h4>
+                <button onclick="switchTab('orders')" class="text-xs text-blue-400 hover:underline">View All Orders →</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="text-slate-400 uppercase text-[10px] font-bold border-b border-[#263247]">
+                    <tr><th class="pb-2">Order</th><th class="pb-2">Customer</th><th class="pb-2">Plan</th><th class="pb-2">Amount</th><th class="pb-2 text-right">Action</th></tr>
+                  </thead>
+                  <tbody id="dashboard-pending-orders" class="divide-y divide-slate-800/50 text-slate-300">
+                    <!-- Populated via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Quick Server & Settings Links -->
+            <div class="glass-panel rounded-2xl p-5 border border-[#263247] space-y-4">
+              <h4 class="font-heading font-bold text-white text-sm pb-3 border-b border-[#263247]">Quick Shortcuts</h4>
+              <div class="space-y-2 text-xs">
+                <button onclick="openPayPalSettingsModal()" class="w-full py-2.5 px-3 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] text-sky-400 flex items-center justify-between font-semibold">
+                  <span>🅿️ Configure PayPal</span>
+                  <span>→</span>
+                </button>
+                <button onclick="openAnnouncementModal()" class="w-full py-2.5 px-3 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] text-blue-400 flex items-center justify-between font-semibold">
+                  <span>📢 Edit Sale Ticker</span>
+                  <span>→</span>
+                </button>
+                                <button onclick="openBackupsModal()" class="w-full py-3 px-4 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] flex items-center justify-between text-xs cursor-pointer">
+                  <div>
+                    <span class="font-bold text-emerald-400 block">💾 Database Backups & Snapshots</span>
+                    <span class="text-slate-400 text-[11px]">Download instant ZIP backups, view history, and automated 30-day retention</span>
+                  </div>
+                  <span class="text-slate-400 font-bold">Manage →</span>
+                </button>
+
+                <button onclick="openProfitSettingsModal()" class="w-full py-2.5 px-3 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] text-emerald-400 flex items-center justify-between font-semibold">
+                  <span>⚙️ Profit & Margin Formula</span>
+                  <span>→</span>
+                </button>
+                <button onclick="openSupplierModal()" class="w-full py-2.5 px-3 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] text-amber-400 flex items-center justify-between font-semibold">
+                  <span>🌐 Launch Supplier Panel</span>
+                  <span>↗</span>
+                </button>
+                <button onclick="openChangePasswordModal()" class="w-full py-2.5 px-3 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] text-purple-400 flex items-center justify-between font-semibold">
+                  <span>🔒 Change Master Password</span>
+                  <span>→</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ==========================================
+             TAB 2: ORDERS MANAGEMENT
+             ========================================== -->
+        <div id="orders" class="scroll-mt-20"></div>
+        <div id="tab-content-orders" class="admin-tab-content hidden space-y-4">
+          
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <h2 class="text-xl font-heading font-bold text-white">Orders Management</h2>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button class="order-status-filter active px-3 py-1 rounded-lg text-xs font-bold bg-slate-700 text-white" data-filter="all">All</button>
+              <button class="order-status-filter px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white" data-filter="Pending">🟡 Pending</button>
+              <button class="order-status-filter px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white" data-filter="Active">🟢 Active</button>
+              <button class="order-status-filter px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white" data-filter="Expired">🔴 Expired</button>
+              <button class="order-status-filter px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white" data-filter="Cancelled">⚪ Cancelled</button>
+              <button id="btn-export-orders" class="px-3 py-1 rounded-lg text-xs font-semibold bg-[#161D2D] text-slate-300 border border-[#263247] hover:bg-[#101522] hover:text-white">Export CSV</button>
+              <button onclick="openNewOrderModal()" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-xs font-bold text-white">+ Create Order</button>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl border border-[#263247] overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-[#0C111D]/90 text-slate-400 uppercase text-[10px] font-bold border-b border-[#263247]">
+                  <tr>
+                    <th class="p-3.5">Order ID & Date</th>
+                    <th class="p-3.5">Customer & Device</th>
+                    <th class="p-3.5">Plan & Screens</th>
+                    <th class="p-3.5">Amount / Method</th>
+                    <th class="p-3.5">Status</th>
+                    <th class="p-3.5">IPTV Credentials</th>
+                    <th class="p-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-table-body" class="divide-y divide-slate-800/60 text-slate-300">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 3: CUSTOMERS CRM
+             ========================================== -->
+        <div id="customers" class="scroll-mt-20"></div>
+        <div id="tab-content-customers" class="admin-tab-content hidden space-y-4">
+          
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <h2 class="text-xl font-heading font-bold text-white">Customer Relationship Management (CRM)</h2>
+            <div class="flex items-center gap-2">
+              <button id="btn-export-customers" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#161D2D] text-slate-300 border border-[#263247] hover:bg-[#101522] hover:text-white">Export CSV</button>
+              <button onclick="openNewCustomerModal()" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold text-white">+ Add Customer</button>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl border border-[#263247] overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-[#0C111D]/90 text-slate-400 uppercase text-[10px] font-bold border-b border-[#263247]">
+                  <tr>
+                    <th class="p-3.5">Customer ID</th>
+                    <th class="p-3.5">Name & Email</th>
+                    <th class="p-3.5">Phone</th>
+                    <th class="p-3.5">Lifetime Value (LTV)</th>
+                    <th class="p-3.5">Tags</th>
+                    <th class="p-3.5">Status</th>
+                    <th class="p-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="customers-table-body" class="divide-y divide-slate-800/60 text-slate-300">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 4: SUBSCRIPTIONS MANAGEMENT
+             ========================================== -->
+        <div id="subscriptions" class="scroll-mt-20"></div>
+        <div id="tab-content-subscriptions" class="admin-tab-content hidden space-y-4">
+          
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <h2 class="text-xl font-heading font-bold text-white">IPTV Line Subscriptions</h2>
+            <div class="flex items-center gap-2 flex-wrap">
+              <select id="subs-filter" class="bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-1 text-xs text-white focus:outline-none">
+                <option value="all">All Lines</option>
+                <option value="ACTIVE">🟢 Active Lines</option>
+                <option value="expiring-today">🚨 Expiring Today</option>
+                <option value="expiring-3d">⚠️ Expiring in 3 Days</option>
+                <option value="expiring-7d">⏰ Expiring in 7 Days</option>
+                <option value="EXPIRED">🔴 Expired Lines</option>
+              </select>
+              <button id="btn-export-subs" class="px-3 py-1 rounded-lg text-xs font-semibold bg-[#161D2D] text-slate-300 border border-[#263247] hover:bg-[#101522] hover:text-white">Export CSV</button>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl border border-[#263247] overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-[#0C111D]/90 text-slate-400 uppercase text-[10px] font-bold border-b border-[#263247]">
+                  <tr>
+                    <th class="p-3.5">Sub ID & Order</th>
+                    <th class="p-3.5">Customer</th>
+                    <th class="p-3.5">Plan / Devices</th>
+                    <th class="p-3.5">Duration & Expiry</th>
+                    <th class="p-3.5">Xtream Credentials</th>
+                    <th class="p-3.5">Status</th>
+                    <th class="p-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="subs-table-body" class="divide-y divide-slate-800/60 text-slate-300">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 5: PAYMENTS LEDGER
+             ========================================== -->
+        <div id="payments" class="scroll-mt-20"></div>
+        <div id="tab-content-payments" class="admin-tab-content hidden space-y-4">
+          
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-heading font-bold text-white">Payment Transactions Ledger</h2>
+            <button id="btn-export-payments" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#161D2D] text-slate-300 border border-[#263247] hover:bg-[#101522] hover:text-white">Export CSV</button>
+          </div>
+
+          <div class="glass-panel rounded-2xl border border-[#263247] overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-[#0C111D]/90 text-slate-400 uppercase text-[10px] font-bold border-b border-[#263247]">
+                  <tr>
+                    <th class="p-3.5">Payment ID</th>
+                    <th class="p-3.5">Order ID</th>
+                    <th class="p-3.5">Customer ID</th>
+                    <th class="p-3.5">Gateway / Provider</th>
+                    <th class="p-3.5">Amount</th>
+                    <th class="p-3.5">Status</th>
+                    <th class="p-3.5 text-right">Date</th>
+                  </tr>
+                </thead>
+                <tbody id="payments-table-body" class="divide-y divide-slate-800/60 text-slate-300">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 6: COUPONS & PROMOTIONS
+             ========================================== -->
+        <div id="coupons" class="scroll-mt-20"></div>
+        <div id="tab-content-coupons" class="admin-tab-content hidden space-y-4">
+          
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-heading font-bold text-white">Coupons & Promo Codes</h2>
+              <p class="text-xs text-slate-400">Server-validated promotional discounts applied at checkout.</p>
+            </div>
+            <button onclick="openNewCouponModal()" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold text-white">+ Create Coupon</button>
+          </div>
+
+          <div class="glass-panel rounded-2xl border border-[#263247] overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-[#0C111D]/90 text-slate-400 uppercase text-[10px] font-bold border-b border-[#263247]">
+                  <tr>
+                    <th class="p-3.5">Code</th>
+                    <th class="p-3.5">Discount</th>
+                    <th class="p-3.5">Usage Count / Limit</th>
+                    <th class="p-3.5">Validity Period</th>
+                    <th class="p-3.5">Allowed Plans</th>
+                    <th class="p-3.5">Status</th>
+                    <th class="p-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="coupons-table-body" class="divide-y divide-slate-800/60 text-slate-300">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 7: FREE TRIALS
+             ========================================== -->
+        <div id="trials" class="scroll-mt-20"></div>
+        <div id="tab-content-trials" class="admin-tab-content hidden space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-heading font-bold text-white">24H Free Trial Requests</h2>
+          </div>
+          <div class="glass-panel rounded-2xl border border-[#263247] overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-[#0C111D]/90 text-slate-400 uppercase text-[10px] font-bold border-b border-[#263247]">
+                  <tr>
+                    <th class="p-3.5">Trial ID</th>
+                    <th class="p-3.5">Email</th>
+                    <th class="p-3.5">Device</th>
+                    <th class="p-3.5">Notes / Request</th>
+                    <th class="p-3.5">Status</th>
+                    <th class="p-3.5 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="trials-table-body" class="divide-y divide-slate-800/60 text-slate-300">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 8: SUPPORT TICKETS (Phase 5)
+             ========================================== -->
+        <div id="tickets" class="scroll-mt-20"></div>
+        <div id="tab-content-tickets" class="admin-tab-content hidden space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-heading font-bold text-white">Customer Support Tickets</h2>
+              <p class="text-xs text-slate-400">Manage inquiries, buffering reports, and setup assistance requests.</p>
+            </div>
+          </div>
+          <div class="glass-panel rounded-2xl border border-[#263247] overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-[#0C111D]/90 text-slate-400 uppercase text-[10px] font-bold border-b border-[#263247]">
+                  <tr>
+                    <th class="p-3.5">Ticket ID</th>
+                    <th class="p-3.5">Customer</th>
+                    <th class="p-3.5">Subject / Category</th>
+                    <th class="p-3.5">Priority</th>
+                    <th class="p-3.5">Status</th>
+                    <th class="p-3.5">Date</th>
+                    <th class="p-3.5 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tickets-table-body" class="divide-y divide-slate-800/60 text-slate-300">
+                  <tr>
+                    <td colspan="7" class="p-6 text-center text-slate-500">
+                      Support ticket system is ready. Customer inquiries submitted via the portal will appear here.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 9: WHATSAPP LEADS & CARTS
+             ========================================== -->
+        <div id="leads" class="scroll-mt-20"></div>
+        <div id="tab-content-leads" class="admin-tab-content hidden space-y-4">
+          <div class="glass-panel rounded-2xl p-4 border border-blue-500/20 text-xs text-slate-300">
+            💡 <strong>High-Intent Lead Tracker:</strong> Users who clicked WhatsApp / Telegram buttons or entered checkout details. Follow up directly to close the subscription!
+          </div>
+
+          <div class="glass-panel rounded-2xl border border-[#263247] overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-[#0C111D]/90 text-slate-400 uppercase text-[10px] font-bold border-b border-[#263247]">
+                  <tr>
+                    <th class="p-3.5">Lead ID</th>
+                    <th class="p-3.5">Source Event</th>
+                    <th class="p-3.5">Customer Info</th>
+                    <th class="p-3.5">Selected Package</th>
+                    <th class="p-3.5">Captured Timestamp</th>
+                    <th class="p-3.5 text-right">Follow-up</th>
+                  </tr>
+                </thead>
+                <tbody id="leads-table-body" class="divide-y divide-slate-800/60 text-slate-300">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 10: VISITOR STREAM & LIVE RADAR
+             ========================================== -->
+        <div id="visitors" class="scroll-mt-20"></div>
+        <div id="tab-content-visitors" class="admin-tab-content hidden space-y-6">
+          
+          <!-- Top Section: Active Browsers Right Now -->
+          <div class="glass-panel rounded-2xl p-5 border border-blue-500/30 bg-[#0C111D]/80 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+              <div class="flex items-center gap-2">
+                <h3 class="font-heading font-bold text-white text-base flex items-center gap-2">
+                  <span>🟢 Active Browsers Right Now</span>
+                </h3>
+                <span class="text-xs text-slate-400">(Customers currently on the website within the last 2 minutes)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span id="tab-active-counter" class="text-xs font-mono font-bold text-emerald-400 px-3 py-1 rounded-lg bg-[#161D2D] border border-[#263247]">0 Online</span>
+              </div>
+            </div>
+            
+            <div id="tab-active-visitors-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div class="col-span-full text-center py-6 text-slate-500 text-xs">
+                No active visitors detected in the last 2 minutes. Open the site in another browser to test.
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Section: Complete Navigation Log Stream -->
+          <div class="glass-panel rounded-2xl border border-[#263247] overflow-hidden space-y-0">
+            <div class="p-4 border-b border-[#263247] flex items-center justify-between">
+              <h3 class="font-heading font-bold text-white text-sm">📜 Complete Visitor Navigation Trail</h3>
+              <span class="text-[11px] text-slate-400">Records all page arrivals &amp; transitions</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-[#0C111D]/90 text-slate-400 uppercase text-[10px] font-bold border-b border-[#263247]">
+                  <tr>
+                    <th class="p-3.5">Log ID</th>
+                    <th class="p-3.5">Visitor Session</th>
+                    <th class="p-3.5">Current Page</th>
+                    <th class="p-3.5">Page Title</th>
+                    <th class="p-3.5">Device</th>
+                    <th class="p-3.5">Referral</th>
+                    <th class="p-3.5 text-right">Time</th>
+                  </tr>
+                </thead>
+                <tbody id="visitors-table-body" class="divide-y divide-slate-800/60 text-slate-300">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ==========================================
+             TAB: PLANS, PRICING & DISCOUNTS ENGINE
+             ========================================== -->
+        <div id="pricing" class="scroll-mt-20"></div>
+        <div id="tab-content-pricing" class="admin-tab-content hidden space-y-6">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#263247] pb-4">
+            <div>
+              <div class="flex items-center gap-2.5">
+                <span class="text-2xl">🏷️</span>
+                <h2 class="text-xl font-heading font-extrabold text-white">Subscription Plans & Pricing Engine</h2>
+                <span class="text-xs px-2.5 py-0.5 rounded-full bg-blue-600/20 text-blue-400 border border-blue-500/30 font-mono font-bold">Dynamic Catalog</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">Adjust retail sale prices, cut previous prices (strikethrough discount), bonus extra months given, and promotion badges with zero code changes.</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button type="button" onclick="loadAdminPricing()" class="px-3.5 py-2 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] text-xs font-bold text-slate-300 flex items-center gap-1.5 transition-colors cursor-pointer">
+                <span>🔄</span>
+                <span>Reset</span>
+              </button>
+              <button type="button" id="btn-save-pricing" onclick="saveAdminPricing()" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-extrabold text-white flex items-center gap-2 shadow-lg shadow-blue-600/20 transition-all cursor-pointer">
+                <span>💾</span>
+                <span>Save All Pricing Changes</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Currency Filter & Helper Toolbar -->
+          <div class="glass-panel rounded-2xl p-4 border border-[#263247] flex flex-wrap items-center justify-between gap-4 bg-[#0C111D]/80">
+            <div class="flex flex-wrap items-center gap-4">
+              <!-- Currency Switcher -->
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-300">Currency:</span>
+                <div class="inline-flex rounded-xl bg-[#080B14] p-1 border border-[#263247]">
+                  <button type="button" onclick="switchPricingCurrencyTab('ALL')" id="cur-tab-ALL" class="pricing-cur-tab px-3 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white transition-colors cursor-pointer">All Currencies</button>
+                  <button type="button" onclick="switchPricingCurrencyTab('GBP')" id="cur-tab-GBP" class="pricing-cur-tab px-3 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-colors cursor-pointer">GBP (£)</button>
+                  <button type="button" onclick="switchPricingCurrencyTab('EUR')" id="cur-tab-EUR" class="pricing-cur-tab px-3 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-colors cursor-pointer">EUR (€)</button>
+                  <button type="button" onclick="switchPricingCurrencyTab('USD')" id="cur-tab-USD" class="pricing-cur-tab px-3 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-colors cursor-pointer">USD ($)</button>
+                </div>
+              </div>
+
+              <!-- Sitewide Bulk Strikethrough Tools -->
+              <div class="flex items-center gap-2 pl-3 border-l border-[#263247]">
+                <span class="text-xs font-bold text-slate-300">⚡ Sitewide Promotion:</span>
+                <button type="button" onclick="autoSetAllPlansCutPrices(1.25)" class="px-2.5 py-1.5 rounded-lg bg-[#080B14] hover:bg-slate-800 border border-[#263247] text-[11px] font-semibold text-slate-300 transition-colors cursor-pointer" title="Auto-fill 25% cut price across all plans">
+                  +25% All Plans
+                </button>
+                <button type="button" onclick="autoSetAllPlansCutPrices(1.35)" class="px-2.5 py-1.5 rounded-lg bg-[#080B14] hover:bg-slate-800 border border-[#263247] text-[11px] font-semibold text-slate-300 transition-colors cursor-pointer" title="Auto-fill 35% cut price across all plans">
+                  +35% All Plans
+                </button>
+                <button type="button" onclick="clearAllPlansCutPrices()" class="px-2.5 py-1.5 rounded-lg bg-[#080B14] hover:bg-red-950/30 border border-red-500/20 text-[11px] font-semibold text-red-400 hover:text-red-300 transition-colors cursor-pointer" title="Remove all strikethrough cut prices across all plans">
+                  Clear All Cuts
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-slate-400 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+                <span>Live synchronized with <code>pricing.html</code>, <code>index.html</code> & <code>checkout.html</code></span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Pricing Plans Cards Container -->
+          <div id="admin-pricing-cards-container" class="space-y-6">
+            <div class="text-center py-12 text-slate-500 text-xs flex items-center justify-center gap-2">
+              <span class="animate-spin text-blue-400">⏳</span>
+              <span>Loading subscription plans and pricing catalog...</span>
+            </div>
+          </div>
+
+          <!-- Documentation & Explanation Card -->
+          <div class="glass-panel rounded-2xl p-5 border border-[#263247] bg-[#0C111D]/50 text-xs text-slate-400 space-y-2">
+            <h4 class="font-bold text-slate-200 flex items-center gap-2">
+              <span>💡</span>
+              <span>How Dynamic Pricing & Promotion Rules Work</span>
+            </h4>
+            <ul class="list-disc list-inside space-y-1 text-[11px] leading-relaxed">
+              <li><strong class="text-white">Sale Price:</strong> The actual price charged to customer upon checkout. Authoritative server verification strictly enforces this price.</li>
+              <li><strong class="text-white">Cut / Previous Price (Strikethrough):</strong> The crossed-out comparison price (e.g. <span class="line-through text-slate-500">£85.00</span>). If set higher than sale price, the customer sees a calculated discount percentage pill (e.g. <span class="text-emerald-400 font-bold">-24% OFF</span>). Leave equal or empty to show regular price without strikethrough.</li>
+              <li><strong class="text-white">Bonus Extra Months:</strong> Additional free months added to the plan. E.g. setting <strong>2</strong> extra months on the 12-Month plan displays <span class="text-blue-400 font-bold">+2 Months Free</span> on the pricing page, and automatically grants a <strong>14-month</strong> subscription in the IPTV panel upon order completion.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 11: SETTINGS & SECURITY
+             ========================================== -->
+        <div id="settings" class="scroll-mt-20"></div>
+        <div id="tab-content-settings" class="admin-tab-content hidden space-y-6">
+          <h2 class="text-xl font-heading font-bold text-white">System Settings & Security</h2>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Quick Configuration Buttons -->
+            <div class="glass-panel rounded-2xl p-5 border border-[#263247] space-y-4">
+              <h3 class="font-bold text-white text-sm border-b border-[#263247] pb-3">Operational Settings</h3>
+              <div class="space-y-3">
+                <button onclick="switchTab('pricing')" class="w-full py-3 px-4 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] flex items-center justify-between text-xs cursor-pointer">
+                  <div>
+                    <span class="font-bold text-violet-400 block">🏷️ Plans, Pricing & Discounts Engine</span>
+                    <span class="text-slate-400 text-[11px]">Edit retail prices, cut previous prices (was/now), and bonus extra months</span>
+                  </div>
+                  <span class="text-slate-400 font-bold">Manage →</span>
+                </button>
+
+                <button onclick="openPayPalSettingsModal()" class="w-full py-3 px-4 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] flex items-center justify-between text-xs">
+                  <div>
+                    <span class="font-bold text-sky-400 block">🅿️ PayPal Payment Gateway</span>
+                    <span class="text-slate-400 text-[11px]">Configure PayPal.Me link, PayPal mode, and checkout notes</span>
+                  </div>
+                  <span class="text-slate-400 font-bold">Configure →</span>
+                </button>
+
+                <button onclick="openAnnouncementModal()" class="w-full py-3 px-4 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] flex items-center justify-between text-xs">
+                  <div>
+                    <span class="font-bold text-blue-400 block">📢 Sale Banner & Running Ticker</span>
+                    <span class="text-slate-400 text-[11px]">Toggle flash sale bar, set discount %, customize text</span>
+                  </div>
+                  <span class="text-slate-400 font-bold">Configure →</span>
+                </button>
+
+                                <button onclick="openBackupsModal()" class="w-full py-3 px-4 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] flex items-center justify-between text-xs cursor-pointer">
+                  <div>
+                    <span class="font-bold text-emerald-400 block">💾 Database Backups & Snapshots</span>
+                    <span class="text-slate-400 text-[11px]">Download instant ZIP backups, view history, and automated 30-day retention</span>
+                  </div>
+                  <span class="text-slate-400 font-bold">Manage →</span>
+                </button>
+
+                <button onclick="openProfitSettingsModal()" class="w-full py-3 px-4 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] flex items-center justify-between text-xs">
+                  <div>
+                    <span class="font-bold text-emerald-400 block">⚙️ Profit & Margin Settings</span>
+                    <span class="text-slate-400 text-[11px]">Set wholesale credit rate and renewal promo discounts</span>
+                  </div>
+                  <span class="text-slate-400 font-bold">Configure →</span>
+                </button>
+
+                <button onclick="openIptvPanelModal()" class="w-full py-3 px-4 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] flex items-center justify-between text-xs cursor-pointer">
+                  <div>
+                    <span class="font-bold text-amber-400 block">🌐 IPTV Reseller Panel API (andy-pro.uk)</span>
+                    <span class="text-slate-400 text-[11px]">Automate line creation, check credit balance & packages</span>
+                  </div>
+                  <span class="text-slate-400 font-bold">Configure →</span>
+                </button>
+
+                <button onclick="openSMTPSettingsModal()" class="w-full py-3 px-4 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] flex items-center justify-between text-xs">
+                  <div>
+                    <span class="font-bold text-sky-400 block">📬 SMTP Server & Live Email Dispatch</span>
+                    <span class="text-slate-400 text-[11px]">Connect live SMTP (Resend, SendGrid, SES) and test handshake</span>
+                  </div>
+                  <span class="text-slate-400 font-bold">Configure →</span>
+                </button>
+
+                <button onclick="openEmailTemplatesModal()" class="w-full py-3 px-4 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] flex items-center justify-between text-xs">
+                  <div>
+                    <span class="font-bold text-blue-400 block">📧 Email Notification Templates</span>
+                    <span class="text-slate-400 text-[11px]">Edit automated delivery, order, and expiry emails</span>
+                  </div>
+                  <span class="text-slate-400 font-bold">Configure →</span>
+                </button>
+
+                <button onclick="triggerManualExpiryCheck()" class="w-full py-3 px-4 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] flex items-center justify-between text-xs">
+                  <div>
+                    <span class="font-bold text-emerald-400 block">⚡ Run Subscription Expiry Scan</span>
+                    <span class="text-slate-400 text-[11px]">Instantly audit all lines and update expiring/expired statuses</span>
+                  </div>
+                  <span class="text-slate-400 font-bold">Scan Now →</span>
+                </button>
+
+                <button onclick="openChangePasswordModal()" class="w-full py-3 px-4 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] flex items-center justify-between text-xs">
+                  <div>
+                    <span class="font-bold text-purple-400 block">🔒 Change Master Password</span>
+                    <span class="text-slate-400 text-[11px]">Update your administrative login password</span>
+                  </div>
+                  <span class="text-slate-400 font-bold">Update →</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Audit Trail Box -->
+            <div class="glass-panel rounded-2xl p-5 border border-[#263247] space-y-4 flex flex-col">
+              <div class="flex items-center justify-between border-b border-[#263247] pb-3">
+                <div>
+                  <h3 class="font-bold text-white text-sm">🛡️ System Audit Log</h3>
+                  <p class="text-[11px] text-slate-400">Record of all administrative actions and logins</p>
+                </div>
+                <button id="btn-load-audit" class="px-3 py-1 bg-blue-600/10 text-slate-400 border border-blue-500/30 hover:bg-blue-600/20 text-xs rounded-lg font-semibold">
+                  Refresh Log
+                </button>
+              </div>
+              <div class="flex-1 overflow-y-auto max-h-96 pr-2">
+                <ul id="audit-log-list" class="space-y-2 text-[11px] font-mono text-slate-300">
+                  <li class="text-slate-500">Click "Refresh Log" to view audit events.</li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- =======================================================
+       MODALS SECTION
+       ======================================================= -->
+
+  <!-- MODAL: ORDER EDIT / CREATE -->
+  <div id="order-edit-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeOrderModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-blue-500/40 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-[#263247]">
+        <h3 id="modal-order-title" class="font-heading font-bold text-lg text-white">Edit Subscription Order</h3>
+        <button onclick="closeOrderModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close Order Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="modal-order-form" class="mt-4 space-y-3.5 text-xs">
+        <input type="hidden" id="edit-order-id">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Customer Name</label>
+            <input type="text" id="edit-order-name" required class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Customer Email</label>
+            <input type="email" id="edit-order-email" required class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Plan</label>
+            <select id="edit-order-plan" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+              <option value="3m">3 Months</option>
+              <option value="6m">6 Months</option>
+              <option value="12m">12 Months</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Screens</label>
+            <select id="edit-order-devices" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+              <option value="1">1 Screen</option>
+              <option value="2">2 Screens</option>
+              <option value="3">3 Screens</option>
+              <option value="5">5 Screens</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Status</label>
+            <select id="edit-order-status" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-bold">
+              <option value="Active">🟢 Active</option>
+              <option value="Pending">🟡 Pending</option>
+              <option value="Expired">🔴 Expired</option>
+              <option value="Cancelled">⚪ Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-[#263247]">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold text-blue-400">IPTV Xtream & M3U Credentials</span>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="generateRandomCredentials()" class="text-[10px] text-slate-400 underline font-semibold">⚡ Random</button>
+              <button type="button" onclick="provisionOrderViaPanelModal()" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold">🌐 Auto-Provision on andy-pro.uk</button>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 mb-1">Xtream Username</label>
+              <input type="text" id="edit-order-user" placeholder="luna_1234" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono">
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Xtream Password</label>
+              <div class="relative">
+              <input type="password" id="edit-order-pass" placeholder="tv_1234" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono pr-9">
+              <button type="button" onclick="togglePasswordVisibility('edit-order-pass', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-sm" title="Show/Hide">👁</button>
+            </div>
+            </div>
+          </div>
+          <div class="mt-2">
+            <label class="block text-slate-400 mb-1">M3U Playlist Download URL</label>
+            <input type="text" id="edit-order-m3u" placeholder="http://line.lunaentertainment.online:8080/get.php?..." class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono text-[11px]">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Internal Notes</label>
+          <textarea id="edit-order-notes" rows="2" placeholder="e.g. Amazon Firestick 4K, WhatsApp VIP customer" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white"></textarea>
+        </div>
+
+        <!-- Payment Confirmation -->
+        <div id="payment-confirm-section" class="hidden pt-2 border-t border-[#263247]">
+          <button type="button" onclick="confirmPaymentReceived()" class="w-full py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-400 text-xs font-bold flex items-center justify-center gap-2 transition-all">
+            <span>✅</span> <span>Confirm Payment Received</span>
+          </button>
+        </div>
+
+        <div class="pt-3 flex gap-3">
+          <button type="submit" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white flex-1 py-2.5 rounded-xl font-bold text-white text-xs">
+            Save & Activate
+          </button>
+          <button type="button" onclick="closeOrderModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CUSTOMER PROFILE & EDIT -->
+  <div id="customer-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeCustomerModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-blue-500/40 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-[#263247]">
+        <h3 id="modal-customer-title" class="font-heading font-bold text-lg text-white">Customer Profile</h3>
+        <button onclick="closeCustomerModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close Customer Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="modal-customer-form" class="mt-4 space-y-3.5 text-xs">
+        <input type="hidden" id="edit-customer-id">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Full Name</label>
+            <input type="text" id="edit-customer-name" required class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Email Address</label>
+            <input type="email" id="edit-customer-email" required class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Phone Number</label>
+            <input type="text" id="edit-customer-phone" placeholder="+44 7..." class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Tags (Comma-separated)</label>
+            <input type="text" id="edit-customer-tags" placeholder="VIP, Premier League" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Customer Notes</label>
+          <textarea id="edit-customer-notes" rows="3" placeholder="Preferences, device history, etc." class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white"></textarea>
+        </div>
+
+        <div class="pt-3 flex gap-3">
+          <button type="submit" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white flex-1 py-2.5 rounded-xl font-bold text-white text-xs">
+            Save Customer
+          </button>
+          <button type="button" onclick="closeCustomerModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white">
+            Cancel
+          </button>
+        </div>
+      </form>
+
+      <!-- CRM Profile: Read-Only Sections -->
+      <div id="crm-profile-sections" class="mt-4 space-y-4 border-t border-[#263247] pt-4 hidden">
+        <!-- Lifetime Value Header -->
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-300">💰 Lifetime Value</span>
+          <span id="crm-ltv" class="text-lg font-black text-emerald-400 font-heading">£0.00</span>
+        </div>
+
+        <!-- Active Subscriptions -->
+        <div>
+          <h4 class="text-xs font-bold text-blue-400 mb-2">📡 Active Subscriptions</h4>
+          <div id="crm-subscriptions-list" class="space-y-1 text-[11px]">
+            <p class="text-slate-500">No subscriptions found.</p>
+          </div>
+        </div>
+
+        <!-- Order History -->
+        <div>
+          <h4 class="text-xs font-bold text-amber-400 mb-2">📦 Order History</h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-[11px]">
+              <thead>
+                <tr class="text-left text-slate-400 border-b border-[#263247]">
+                  <th class="pb-1 pr-2">Order ID</th>
+                  <th class="pb-1 pr-2">Date</th>
+                  <th class="pb-1 pr-2">Plan</th>
+                  <th class="pb-1 pr-2">Amount</th>
+                  <th class="pb-1">Status</th>
+                </tr>
+              </thead>
+              <tbody id="crm-orders-list" class="text-slate-300">
+                <tr><td colspan="5" class="py-2 text-slate-500">No orders found.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Payment History -->
+        <div>
+          <h4 class="text-xs font-bold text-purple-400 mb-2">💳 Payment History</h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-[11px]">
+              <thead>
+                <tr class="text-left text-slate-400 border-b border-[#263247]">
+                  <th class="pb-1 pr-2">Date</th>
+                  <th class="pb-1 pr-2">Method</th>
+                  <th class="pb-1 pr-2">Amount</th>
+                  <th class="pb-1">Reference</th>
+                </tr>
+              </thead>
+              <tbody id="crm-payments-list" class="text-slate-300">
+                <tr><td colspan="4" class="py-2 text-slate-500">No payments found.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SUBSCRIPTION EXTEND & EDIT -->
+  <div id="subscription-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeSubscriptionModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-blue-500/40 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-[#263247]">
+        <h3 class="font-heading font-bold text-lg text-white">Manage IPTV Subscription</h3>
+        <button onclick="closeSubscriptionModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close Subscription Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="modal-subscription-form" class="mt-4 space-y-3.5 text-xs">
+        <input type="hidden" id="edit-sub-id">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Status</label>
+            <select id="edit-sub-status" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-bold">
+              <option value="ACTIVE">🟢 ACTIVE</option>
+              <option value="SUSPENDED">🟡 SUSPENDED</option>
+              <option value="EXPIRED">🔴 EXPIRED</option>
+              <option value="CANCELLED">⚪ CANCELLED</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">End Date</label>
+            <input type="date" id="edit-sub-end-date" required class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono">
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1 pb-2">
+          <span class="text-slate-400 text-[11px]">Quick Extend:</span>
+          <button type="button" onclick="extendSubscriptionDate(1)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded text-[10px] font-bold border border-[#263247]">+1 Month</button>
+          <button type="button" onclick="extendSubscriptionDate(3)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded text-[10px] font-bold border border-[#263247]">+3 Months</button>
+          <button type="button" onclick="extendSubscriptionDate(6)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded text-[10px] font-bold border border-[#263247]">+6 Months</button>
+          <button type="button" onclick="extendSubscriptionDate(12)" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded text-[10px] font-bold border border-[#263247]">+12 Months</button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 mb-1">Xtream Username</label>
+            <input type="text" id="edit-sub-user" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Xtream Password</label>
+            <div class="relative">
+              <input type="password" id="edit-sub-pass" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono pr-9">
+              <button type="button" onclick="togglePasswordVisibility('edit-sub-pass', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-sm" title="Show/Hide">👁</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">M3U URL</label>
+          <input type="text" id="edit-sub-m3u" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono text-[11px]">
+        </div>
+
+        <div class="pt-3 flex gap-3">
+          <button type="submit" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white flex-1 py-2.5 rounded-xl font-bold text-white text-xs">
+            Save Subscription
+          </button>
+          <button type="button" onclick="closeSubscriptionModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: COUPON CREATE / EDIT -->
+  <div id="coupon-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeCouponModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-md w-full p-6 sm:p-8 border border-blue-500/40 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-[#263247]">
+        <h3 id="modal-coupon-title" class="font-heading font-bold text-lg text-white">Create Promo Coupon</h3>
+        <button onclick="closeCouponModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close Coupon Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="modal-coupon-form" class="mt-4 space-y-3.5 text-xs">
+        <input type="hidden" id="edit-coupon-id">
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Coupon Code (Uppercase)</label>
+          <input type="text" id="edit-coupon-code" required placeholder="LUNA25" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono font-bold uppercase tracking-wider">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Discount Type</label>
+            <select id="edit-coupon-type" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+              <option value="percentage">Percentage (%)</option>
+              <option value="fixed">Fixed Amount</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Discount Value</label>
+            <input type="number" step="0.01" min="1" id="edit-coupon-val" required placeholder="20" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono font-bold">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Valid From</label>
+            <input type="date" id="edit-coupon-from" required class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Valid Until</label>
+            <input type="date" id="edit-coupon-until" required class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Usage Limit</label>
+            <input type="number" min="1" id="edit-coupon-limit" placeholder="100" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono">
+          </div>
+          <div class="flex items-center gap-2 pt-6">
+            <input type="checkbox" id="edit-coupon-active" checked class="w-4 h-4 rounded text-blue-600 bg-[#0C111D] border-[#263247]">
+            <label for="edit-coupon-active" class="text-slate-300 font-semibold cursor-pointer">Active Coupon</label>
+          </div>
+        </div>
+
+        <div class="pt-3 flex gap-3">
+          <button type="submit" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white flex-1 py-2.5 rounded-xl font-bold text-white text-xs">
+            Save Coupon
+          </button>
+          <button type="button" onclick="closeCouponModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CUSTOMER DELIVERY MESSAGE CARD -->
+  <div id="customer-delivery-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeDeliveryModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-emerald-500/40 shadow-2xl z-10 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📦</span>
+          <h3 class="font-heading font-bold text-lg text-white">Customer Activation Message</h3>
+        </div>
+        <button onclick="closeDeliveryModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close Delivery Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-400">
+        Ready-to-send credentials for <strong id="deliv-customer-name" class="text-white">Customer</strong>. Send directly on WhatsApp, Telegram, or Email!
+      </p>
+
+      <div>
+        <textarea id="deliv-message-text" rows="8" readonly class="w-full bg-[#0C111D] border border-[#263247] rounded-xl p-3.5 text-xs text-emerald-300 font-mono focus:outline-none select-all leading-relaxed"></textarea>
+      </div>
+
+      <div class="flex flex-wrap gap-2 pt-2">
+        <button onclick="copyDeliveryMessage()" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white flex-1 py-2.5 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1.5">
+          <span>Copy Message</span>
+        </button>
+        <a id="btn-deliv-send-whatsapp" href="https://wa.me/447413469398" target="_blank" class="btn-whatsapp px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
+          <span>Open WhatsApp</span> &rarr;
+        </a>
+        <button onclick="closeDeliveryModal()" class="px-3 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PROFIT & MARGINS CONFIGURATION -->
+  <div id="profit-settings-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeProfitSettingsModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-md w-full p-6 sm:p-8 border border-emerald-500/40 shadow-2xl z-10 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">⚙️</span>
+          <div>
+            <h3 class="font-heading font-bold text-lg text-white">Profit & Margin Settings</h3>
+            <p class="text-[11px] text-slate-400">Configure wholesale credit rate for automatic net profit tracking.</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeProfitSettingsModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close Profit Settings Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="profit-settings-form" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Wholesale Cost Per 1 Full Credit (£ GBP)</label>
+          <input type="number" step="0.01" min="0" id="cfg-cost-per-credit" required class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2.5 text-white font-mono text-sm focus:outline-none focus:border-emerald-400" placeholder="2.50">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Renewal Offer Discount (%)</label>
+          <input type="number" step="1" min="0" max="50" id="cfg-renewal-discount" required class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2.5 text-white font-mono text-sm focus:outline-none focus:border-emerald-400" placeholder="15">
+        </div>
+
+        <div class="pt-3 flex gap-2">
+          <button type="submit" class="flex-1 py-3 rounded-xl font-bold text-white text-xs uppercase tracking-wider bg-emerald-400 hover:bg-emerald-300 transition-colors shadow-lg shadow-emerald-500/20">
+            💾 Save Profit Settings
+          </button>
+          <button type="button" onclick="closeProfitSettingsModal()" class="px-4 py-3 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SUPPLIER PANEL LAUNCHER -->
+  <div id="supplier-panel-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeSupplierModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-md w-full p-6 sm:p-8 border border-amber-500/40 shadow-2xl z-10 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🌐</span>
+          <div>
+            <h3 class="font-heading font-bold text-lg text-white">Wholesale Supplier Panel</h3>
+            <p class="text-[11px] text-slate-400">Manage and open your external IPTV reseller credit portal.</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeSupplierModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close Supplier Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="supplier-panel-form" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Supplier Reseller Panel Web URL</label>
+          <input type="url" id="cfg-supplier-url" required class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2.5 text-white font-mono text-xs focus:outline-none focus:border-amber-400" placeholder="https://panel.example.com">
+        </div>
+
+        <div class="pt-2">
+          <a id="btn-supplier-modal-launch" href="https://panel.example.com" target="_blank" class="w-full py-3 rounded-xl font-extrabold text-white text-xs uppercase tracking-wider bg-amber-400 hover:bg-amber-300 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20">
+            <span>🚀 Open Supplier Panel</span> &rarr;
+          </a>
+        </div>
+
+        <div class="pt-2 flex gap-2">
+          <button type="submit" class="flex-1 py-2.5 rounded-xl font-bold text-slate-200 text-xs bg-slate-800 hover:bg-slate-700 border border-[#263247]">
+            💾 Save URL
+          </button>
+          <button type="button" onclick="closeSupplierModal()" class="px-4 py-2.5 rounded-xl bg-[#0C111D] text-slate-400 hover:text-white">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: LIVE SALE & PROMO TICKER -->
+  <div id="announcement-settings-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeAnnouncementModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-xl w-full p-6 sm:p-8 border border-blue-500/40 shadow-2xl z-10 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">📢</span>
+          <div>
+            <h3 class="font-heading font-bold text-lg text-white">Live Sale & Promo Ticker</h3>
+            <p class="text-[11px] text-slate-400">Configure discount percentage, promo code, and ticker banner.</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeAnnouncementModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close Announcement Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="announcement-settings-form" class="space-y-4 text-xs">
+        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-[#0C111D] border border-[#263247]">
+          <div>
+            <span class="font-bold text-white block text-sm">Banner Active on Website</span>
+            <span class="text-[11px] text-slate-400">Toggle running ticker visibility on/off</span>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="ann-enabled" class="sr-only peer">
+            <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Discount Percentage (%)</label>
+            <input type="number" id="ann-discount" min="0" max="90" required class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2 text-white font-mono font-bold text-sm focus:outline-none focus:border-blue-500" placeholder="20">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Coupon Code</label>
+            <input type="text" id="ann-promo" required class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2 text-white font-mono font-bold uppercase text-xs focus:outline-none focus:border-blue-500" placeholder="LUNA20">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Badge Tag</label>
+          <input type="text" id="ann-badge" required class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2 text-white font-bold text-xs focus:outline-none focus:border-blue-500" placeholder="🔥 FLASH SALE">
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-300 block mb-1">Running Ticker Message</label>
+          <textarea id="ann-text" rows="2" required class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2.5 text-white text-xs leading-relaxed focus:outline-none focus:border-blue-500" placeholder="USE CODE 'LUNA20' FOR 20% OFF ALL PASSES • INSTANT 5-MIN ACTIVATION"></textarea>
+        </div>
+
+        <div class="pt-3 flex gap-2">
+          <button type="submit" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white flex-1 py-3 rounded-xl font-extrabold text-white text-xs uppercase tracking-wider shadow-lg">
+            💾 Publish Banner to Website
+          </button>
+          <button type="button" onclick="closeAnnouncementModal()" class="px-5 py-3 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: PAYPAL SETTINGS -->
+  <div id="paypal-settings-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closePayPalSettingsModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-sky-500/40 shadow-2xl z-10 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-xl border border-sky-500/30">
+            🅿️
+          </div>
+          <div>
+            <h3 class="font-heading font-bold text-lg text-white">PayPal Payment Gateway Setup</h3>
+            <p class="text-[11px] text-slate-400">Configure PayPal email, PayPal.Me redirect, and customer instructions.</p>
+          </div>
+        </div>
+        <button type="button" onclick="closePayPalSettingsModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close PayPal Settings Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="paypal-settings-form" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">PayPal Integration Mode</label>
+          <select id="set-paypal-mode" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2.5 text-white text-xs font-semibold focus:outline-none focus:border-blue-500">
+            <option value="paypal_me">🔗 PayPal.Me Direct Link (Recommended)</option>
+            <option value="paypal_email">📧 Standard PayPal Email</option>
+            <option value="smart_buttons">⚡ PayPal Smart Buttons</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">PayPal Email Address</label>
+            <input type="email" id="set-paypal-email" required class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-3.5 py-2.5 text-white font-mono text-xs focus:outline-none focus:border-blue-500" placeholder="wasifali740@gmail.com">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">PayPal.Me Handle / Link</label>
+            <input type="text" id="set-paypal-me-link" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-3.5 py-2.5 text-white font-mono text-xs focus:outline-none focus:border-blue-500" placeholder="paypal.me/adilfarooq909">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">PayPal Client ID</label>
+          <input type="text" id="set-paypal-client-id" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2.5 text-white font-mono text-xs focus:outline-none focus:border-blue-500" placeholder="BAAh...">
+          <p class="text-[10px] text-slate-500 mt-1">Secret is securely preserved on server.</p>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Customer Payment Instructions</label>
+          <textarea id="set-paypal-instructions" rows="2" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2 text-white text-xs leading-relaxed focus:outline-none focus:border-blue-500" placeholder="Send payment via PayPal. Enter order ID in note. Credentials sent in 5 mins."></textarea>
+        </div>
+
+        <div class="pt-3 flex gap-2">
+          <button type="submit" class="w-full py-3 rounded-xl bg-[#ffc439] hover:bg-[#f2ba36] text-[#003087] font-black text-xs uppercase tracking-wider shadow-lg transition-all cursor-pointer">
+            💾 Save PayPal Configuration
+          </button>
+          <button type="button" onclick="closePayPalSettingsModal()" class="px-5 py-3 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CHANGE MASTER PASSWORD -->
+  <div id="change-password-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeChangePasswordModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-md w-full p-6 sm:p-8 border border-purple-500/40 shadow-2xl z-10 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+        <h3 class="font-heading font-bold text-lg text-white flex items-center gap-2">
+          <span>🔒 Change Master Password</span>
+        </h3>
+        <button onclick="closeChangePasswordModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close Change Password Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="change-password-form" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Current Password</label>
+          <div class="relative">
+              <input type="password" id="pw-current" required class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono pr-9">
+              <button type="button" onclick="togglePasswordVisibility('pw-current', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-sm" title="Show/Hide">👁</button>
+            </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">New Password</label>
+          <div class="relative">
+              <input type="password" id="pw-new" required oninput="updatePasswordStrength(this.value)" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono pr-9">
+              <button type="button" onclick="togglePasswordVisibility('pw-new', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-sm" title="Show/Hide">👁</button>
+            </div>
+            <div id="pw-strength-bar" class="mt-1.5 hidden">
+              <div class="flex gap-1 mb-1">
+                <div id="pw-bar-1" class="h-1 flex-1 rounded-full bg-[#263247]"></div>
+                <div id="pw-bar-2" class="h-1 flex-1 rounded-full bg-[#263247]"></div>
+                <div id="pw-bar-3" class="h-1 flex-1 rounded-full bg-[#263247]"></div>
+                <div id="pw-bar-4" class="h-1 flex-1 rounded-full bg-[#263247]"></div>
+              </div>
+              <p id="pw-strength-label" class="text-[10px] text-slate-500">Min 8 chars, mix of uppercase, lowercase & numbers</p>
+            </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Confirm New Password</label>
+          <div class="relative">
+              <input type="password" id="pw-confirm" required class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white font-mono pr-9">
+              <button type="button" onclick="togglePasswordVisibility('pw-confirm', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-sm" title="Show/Hide">👁</button>
+            </div>
+        </div>
+
+        <div class="pt-3 flex gap-3">
+          <button type="submit" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white flex-1 py-2.5 rounded-xl font-bold text-white text-xs">
+            Update Password
+          </button>
+          <button type="button" onclick="closeChangePasswordModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EMAIL TEMPLATES MANAGER -->
+  <div id="email-templates-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeEmailTemplatesModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-2xl w-full p-6 sm:p-8 border border-blue-500/40 shadow-2xl z-10 space-y-4 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+        <div>
+          <h3 class="font-heading font-bold text-lg text-white flex items-center gap-2">
+            <span>📧 Email Notification Templates</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Customize automated customer transactional notifications</p>
+        </div>
+        <button onclick="closeEmailTemplatesModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close Email Templates Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-3 bg-[#0C111D]/80 p-3 rounded-xl border border-[#263247] text-xs">
+        <label class="text-slate-400 font-semibold flex-shrink-0">Select Template:</label>
+        <select id="email-template-select" onchange="onSelectEmailTemplate(this.value)" class="w-full bg-slate-800 border border-[#263247] rounded-lg px-3 py-1.5 text-white font-semibold text-xs">
+          <option value="ORDER_RECEIVED">Order Received</option>
+          <option value="PAYMENT_CONFIRMED">Payment Confirmed</option>
+          <option value="CREDENTIALS_DELIVERED">Credentials Delivered (Active)</option>
+          <option value="TRIAL_DISPATCHED">24H Free Trial Dispatched</option>
+          <option value="EXPIRY_REMINDER_7D">Expiry Reminder (7 Days)</option>
+          <option value="EXPIRY_REMINDER_3D">Expiry Reminder (3 Days)</option>
+          <option value="EXPIRY_REMINDER_1D">Expiry Reminder (1 Day)</option>
+          <option value="PASSWORD_RESET">Password Reset Code</option>
+        </select>
+      </div>
+
+      <form id="email-template-form" onsubmit="saveCurrentEmailTemplate(event)" class="space-y-3 text-xs flex-1 flex flex-col overflow-y-auto">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Subject Line</label>
+          <input type="text" id="email-template-subject" required class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2 text-white font-medium focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div class="flex-1 flex flex-col">
+          <div class="flex items-center justify-between mb-1">
+            <label class="font-semibold text-slate-300">Email Body (Plain Text)</label>
+            <span id="email-template-vars" class="text-[10px] text-blue-400 font-mono"></span>
+          </div>
+          <textarea id="email-template-body" rows="8" required class="w-full flex-1 bg-[#0C111D] border border-[#263247] rounded-xl p-3 text-white font-mono text-xs leading-relaxed focus:outline-none focus:border-blue-500"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-between gap-3 border-t border-[#263247]">
+          <button type="button" onclick="previewEmailTemplate()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 font-bold">
+            👁️ Preview Sample
+          </button>
+          <div class="flex gap-2">
+            <button type="submit" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-xl font-bold text-white">
+              Save Template
+            </button>
+            <button type="button" onclick="closeEmailTemplatesModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white">
+              Close
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EMAIL TEMPLATE PREVIEW -->
+  <div id="email-preview-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="document.getElementById('email-preview-modal').classList.add('hidden')"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-lg w-full p-6 border border-blue-500/40 shadow-2xl z-10 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">✉️</span>
+          <h3 class="font-heading font-bold text-lg text-white">Email Sample Preview</h3>
+        </div>
+        <button onclick="document.getElementById('email-preview-modal').classList.add('hidden')" class="text-slate-400 hover:text-white p-1" aria-label="Close Email Preview">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <span class="text-slate-400 block mb-1 font-semibold">Subject Preview:</span>
+          <div id="email-preview-rendered-subject" class="font-bold text-white bg-[#0C111D] p-2.5 rounded-xl border border-[#263247]"></div>
+        </div>
+        <div>
+          <span class="text-slate-400 block mb-1 font-semibold">Body Preview:</span>
+          <pre id="email-preview-rendered-body" class="font-mono text-slate-300 bg-[#0C111D] p-3 rounded-xl border border-[#263247] whitespace-pre-wrap max-h-56 overflow-y-auto leading-relaxed"></pre>
+        </div>
+      </div>
+      <div class="pt-2 flex justify-end">
+        <button type="button" onclick="document.getElementById('email-preview-modal').classList.add('hidden')" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl font-bold text-xs">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: TICKET VIEW & REPLY -->
+  <div id="ticket-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeTicketModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-2xl w-full p-6 sm:p-8 border border-blue-500/40 shadow-2xl z-10 space-y-4 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🎫</span>
+            <h3 id="ticket-modal-title" class="font-heading font-bold text-lg text-white">Ticket Details</h3>
+          </div>
+          <p id="ticket-modal-subtitle" class="text-xs text-slate-400 mt-0.5">From customer</p>
+        </div>
+        <button onclick="closeTicketModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close Ticket Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Quick status/priority controls -->
+      <div class="flex items-center justify-between gap-3 bg-[#0C111D]/80 p-3 rounded-xl border border-[#263247] text-xs">
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400 font-semibold">Status:</span>
+          <select id="ticket-modal-status" class="bg-slate-800 border border-[#263247] rounded-lg px-2.5 py-1 text-white font-bold">
+            <option value="OPEN">🟢 OPEN</option>
+            <option value="WAITING_ON_ADMIN">🟡 WAITING_ON_ADMIN</option>
+            <option value="WAITING_ON_CUSTOMER">🔵 WAITING_ON_CUSTOMER</option>
+            <option value="RESOLVED">⚪ RESOLVED</option>
+            <option value="CLOSED">⚫ CLOSED</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400 font-semibold">Priority:</span>
+          <select id="ticket-modal-priority" class="bg-slate-800 border border-[#263247] rounded-lg px-2.5 py-1 text-white font-bold">
+            <option value="LOW">LOW</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="HIGH">HIGH</option>
+            <option value="URGENT">🚨 URGENT</option>
+          </select>
+        </div>
+        <button onclick="saveTicketStatusPriority()" class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-bold">Save Status</button>
+      </div>
+
+      <!-- Message Thread Container -->
+      <div id="ticket-thread-container" class="flex-1 overflow-y-auto space-y-3 p-4 bg-[#0C111D]/50 rounded-xl border border-[#263247]/80 max-h-60">
+        <!-- Messages rendered via JS -->
+      </div>
+
+      <!-- Reply Box -->
+      <form id="form-ticket-reply" class="space-y-3 pt-2 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Reply to Customer</label>
+          <textarea id="ticket-reply-message" rows="3" required placeholder="Type your response to the subscriber..." class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2.5 text-white leading-relaxed focus:outline-none focus:border-blue-500"></textarea>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400">Set status after reply:</span>
+            <select id="reply-set-status" class="bg-[#0C111D] border border-[#263247] rounded-lg px-2.5 py-1 text-white">
+              <option value="WAITING_ON_CUSTOMER">Waiting on Customer</option>
+              <option value="RESOLVED">Resolved</option>
+            </select>
+          </div>
+          <div class="flex gap-2">
+            <button type="submit" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl font-bold text-white">Send Reply</button>
+            <button type="button" onclick="closeTicketModal()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl">Close</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  
+  <!-- MODAL: SMTP SETTINGS -->
+  <div id="smtp-settings-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeSMTPSettingsModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-sky-500/40 shadow-2xl z-10 max-h-[90vh] overflow-y-auto space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+        <h3 class="font-heading font-bold text-lg text-white flex items-center gap-2">
+          <span>📬 SMTP Email Configuration</span>
+        </h3>
+        <button onclick="closeSMTPSettingsModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close SMTP Settings Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="smtp-settings-form" onsubmit="saveSMTPSettings(event)" class="space-y-3.5 text-xs">
+        <div class="flex items-center gap-3">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="set-smtp-enabled" class="accent-blue-500 w-4 h-4">
+            <span class="font-bold text-slate-300">Enable Live Email Dispatch</span>
+          </label>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div class="col-span-2">
+            <label class="block font-semibold text-slate-300 mb-1">SMTP Server</label>
+            <input type="text" id="set-smtp-server" placeholder="smtp.resend.com" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Port</label>
+            <input type="number" id="set-smtp-port" value="587" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Username / API Key</label>
+            <input type="text" id="set-smtp-user" placeholder="resend" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Password / Secret</label>
+            <div class="relative">
+              <input type="password" id="set-smtp-pass" placeholder="Enter or leave blank to keep" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white pr-9">
+              <button type="button" onclick="togglePasswordVisibility('set-smtp-pass', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-sm" title="Show/Hide">👁</button>
+            </div>
+            <p id="smtp-pass-indicator" class="text-[10px] text-emerald-400 mt-1 hidden">✅ Password is saved on server</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">From Email</label>
+            <input type="email" id="set-smtp-from" value="support@lunaentertainment.online" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+          <div class="flex items-end pb-1">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="set-smtp-ssl" checked class="accent-blue-500 w-4 h-4">
+              <span class="font-semibold text-slate-300">Use SSL/TLS</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="pt-2 flex gap-3">
+          <button type="submit" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white flex-1 py-2.5 rounded-xl font-bold text-xs">Save SMTP Settings</button>
+          <button type="button" onclick="closeSMTPSettingsModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs">Cancel</button>
+        </div>
+      </form>
+
+      <!-- Test Email Section -->
+      <div class="border-t border-[#263247] pt-3 space-y-3">
+        <h4 class="font-bold text-slate-300 text-xs">🧪 Send Test Email</h4>
+        <div class="flex gap-2">
+          <input type="email" id="smtp-test-recipient" placeholder="test@example.com" class="flex-1 bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white text-xs">
+          <button type="button" id="btn-send-test-email" onclick="sendTestEmail()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold">Send Test</button>
+        </div>
+        <div id="smtp-test-result" class="hidden text-[11px] p-2.5 rounded-xl border"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DATABASE BACKUPS -->
+  <div id="backups-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeBackupsModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-xl w-full p-6 sm:p-8 border border-emerald-500/40 shadow-2xl z-10 max-h-[90vh] overflow-y-auto space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+        <h3 class="font-heading font-bold text-lg text-white flex items-center gap-2">
+          <span>💾 Database Backups & Snapshots</span>
+        </h3>
+        <button onclick="closeBackupsModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close Backups Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <p class="text-slate-400 text-xs">Instant ZIP snapshots of all database JSON files (<span id="backups-total-count" class="text-emerald-400 font-bold">0</span> total, 30-day auto-retention).</p>
+        <button type="button" onclick="createManualBackup()" id="btn-create-backup" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shrink-0">+ Create Backup</button>
+      </div>
+
+      <div class="overflow-x-auto border border-[#263247] rounded-xl">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-[#0C111D] text-slate-400 font-semibold border-b border-[#263247]">
+            <tr>
+              <th class="p-3">Archive Filename</th>
+              <th class="p-3">Created At</th>
+              <th class="p-3">Size</th>
+              <th class="p-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="backups-table-body" class="divide-y divide-[#263247]">
+            <tr><td colspan="4" class="p-6 text-center text-slate-500">Loading backups...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: IPTV RESELLER PANEL API -->
+  <div id="iptv-panel-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeIptvPanelModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-amber-500/40 shadow-2xl z-10 max-h-[90vh] overflow-y-auto space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+        <h3 class="font-heading font-bold text-lg text-white flex items-center gap-2">
+          <span>🌐 IPTV Reseller Panel API</span>
+        </h3>
+        <button onclick="closeIptvPanelModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close IPTV Panel Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="iptv-panel-form" class="space-y-3.5 text-xs">
+        <div class="flex items-center gap-3">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="set-iptv-auto-provision" class="accent-amber-500 w-4 h-4">
+            <span class="font-bold text-slate-300">Enable Auto-Provisioning</span>
+          </label>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Panel URL</label>
+          <input type="url" id="set-iptv-panel-url" placeholder="https://andy-pro.uk" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Panel Username</label>
+            <input type="text" id="set-iptv-panel-user" placeholder="luna_reseller" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Panel Password</label>
+            <div class="relative">
+              <input type="password" id="set-iptv-panel-pass" placeholder="Enter panel password" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white pr-9">
+              <button type="button" onclick="togglePasswordVisibility('set-iptv-panel-pass', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-sm" title="Show/Hide">👁</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">3-Month Package ID</label>
+            <input type="text" id="set-iptv-pkg-3m" placeholder="101" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">6-Month Package ID</label>
+            <input type="text" id="set-iptv-pkg-6m" placeholder="102" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">12-Month Package ID</label>
+            <input type="text" id="set-iptv-pkg-12m" placeholder="103" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Trial Package ID</label>
+            <input type="text" id="set-iptv-pkg-trial" placeholder="999" class="w-full bg-[#0C111D] border border-[#263247] rounded-lg px-3 py-2 text-white">
+          </div>
+        </div>
+
+        <div class="pt-2 flex gap-3">
+          <button type="submit" class="btn-primary bg-amber-600 hover:bg-amber-500 text-white flex-1 py-2.5 rounded-xl font-bold text-xs">Save Panel Settings</button>
+          <button type="button" onclick="closeIptvPanelModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs">Cancel</button>
+        </div>
+      </form>
+
+      <!-- Test Connection & Credits -->
+      <div class="border-t border-[#263247] pt-3 space-y-3">
+        <div class="flex gap-2">
+          <button type="button" onclick="testIptvPanelConnection()" class="px-4 py-2 bg-amber-700 hover:bg-amber-600 text-white rounded-xl text-xs font-bold flex-1">🔗 Test Connection</button>
+          <button type="button" onclick="fetchIptvPanelPackages()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-bold flex-1">📦 Fetch Packages</button>
+        </div>
+        <div id="iptv-panel-test-result" class="hidden text-[11px] p-2.5 rounded-xl border"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="live-visitor-toast-container" class="fixed top-20 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>

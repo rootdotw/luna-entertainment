@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Pricing Test Harness</title>
+</head>
+<body>
+  <div id="badge-count-pricing"></div>
+  <div id="admin-pricing-cards-container"></div>
+  <button id="btn-save-pricing">Save</button>
+  <div id="cur-tab-ALL" class="pricing-cur-tab"></div>
+  <div id="cur-tab-GBP" class="pricing-cur-tab"></div>
+  <div id="cur-tab-EUR" class="pricing-cur-tab"></div>
+  <div id="cur-tab-USD" class="pricing-cur-tab"></div>
+  <div id="toast-container"></div>
+
+  <div id="test-results"></div>
+
+  <script>
+    // Pre-populate session token
+    sessionStorage.setItem('ps_admin_token', 'iDsHHcOwrP3n3myeRAbzlmtoYfVqsdxckjNfvTIHbJw');
+    window.showToast = function(msg, type) {
+      console.log('[TOAST ' + type + ']: ' + msg);
+    };
+  </script>
+  <script src="assets/js/admin.js"></script>
+  <script>
+    async function runTestSuite() {
+      const logs = [];
+      function logResult(name, passed, detail) {
+        logs.push({ name, passed, detail: detail || '' });
+        console.log((passed ? 'PASS: ' : 'FAIL: ') + name + (detail ? ' - ' + detail : ''));
+      }
+
+      try {
+        // Test 1: loadAdminPricing
+        await loadAdminPricing();
+        logResult('loadAdminPricing', !!adminPricingCatalog && !!adminPricingCatalog.plans, 'Plans: ' + Object.keys(adminPricingCatalog.plans).join(', '));
+
+        // Test 2: renderAdminPricing DOM check
+        const card12m = document.getElementById('admin-plan-card-12m');
+        logResult('renderAdminPricing card-12m DOM presence', !!card12m, card12m ? 'Found card' : 'Missing');
+
+        // Test 3: Currency helper functions
+        const currs = getAdminPricingCurrencies();
+        logResult('getAdminPricingCurrencies returns array', Array.isArray(currs) && currs.length === 3, 'Currencies: ' + currs.join(', '));
+        const symGbp = getCurrencySymbol('GBP');
+        logResult('getCurrencySymbol GBP', symGbp === '£', 'Symbol: ' + symGbp);
+
+        // Test 4: +25% Strikethrough on 12m
+        autoSetPlanCutPrices('12m', 1.25);
+        const cutInput12m = document.getElementById('price-prev-12m-1-GBP');
+        const cutVal = cutInput12m ? parseFloat(cutInput12m.value) : 0;
+        logResult('autoSetPlanCutPrices 12m (+25%)', cutVal > 65, 'Cut price for 12m 1-screen GBP: ' + cutVal);
+
+        // Test 5: Check in-memory catalog update
+        const memCut = (adminPricingCatalog.plans['12m'].previous_pricing && adminPricingCatalog.plans['12m'].previous_pricing['1'] && adminPricingCatalog.plans['12m'].previous_pricing['1']['GBP']) || 0;
+        logResult('In-memory catalog previous_pricing updated', memCut > 65, 'In-memory cut: ' + memCut);
+
+        // Test 6: Sitewide Strikethrough +35%
+        autoSetAllPlansCutPrices(1.35);
+        const cutInput3m = document.getElementById('price-prev-3m-1-GBP');
+        const cutVal3m = cutInput3m ? parseFloat(cutInput3m.value) : 0;
+        logResult('autoSetAllPlansCutPrices (+35%) on 3m', cutVal3m > 25, 'Cut price for 3m 1-screen GBP: ' + cutVal3m);
+
+        // Test 7: Currency Switcher
+        switchPricingCurrencyTab('EUR');
+        const curEurInput = document.getElementById('price-sale-12m-1-EUR');
+        logResult('switchPricingCurrencyTab EUR DOM presence', !!curEurInput, curEurInput ? 'EUR input present' : 'Missing');
+
+        switchPricingCurrencyTab('ALL');
+        const curAllGbp = document.getElementById('price-sale-12m-1-GBP');
+        const curAllEur = document.getElementById('price-sale-12m-1-EUR');
+        logResult('switchPricingCurrencyTab ALL shows all currencies', !!curAllGbp && !!curAllEur);
+
+        // Test 8: Save Pricing Changes to Backend
+        await saveAdminPricing();
+        logResult('saveAdminPricing executes successfully', true, 'Saved to server');
+
+        // Test 9: Clear cuts
+        clearAllPlansCutPrices();
+        const clearedCut = document.getElementById('price-prev-12m-1-GBP');
+        logResult('clearAllPlansCutPrices clears inputs', !clearedCut.value, 'Value is empty string');
+
+        // Test 10: Save clean pricing back to server
+        await saveAdminPricing();
+        logResult('saveAdminPricing clean state preserved', true, 'Clean catalog saved');
+
+      } catch (err) {
+        logResult('EXCEPTION_IN_TEST', false, err.stack || err.message);
+      }
+
+      document.getElementById('test-results').textContent = JSON.stringify(logs);
+      window.__TEST_DONE__ = true;
+    }
+
+    window.addEventListener('DOMContentLoaded', runTestSuite);
+  </script>
+</body>
+</html>

@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Device Setup & Installation Tutorials - Luna Stream IPTV</title>
+
+  <link rel="canonical" href="https://lunaentertainment.online/setup.html">
+
+  <meta name="robots" content="index, follow">
+
+  <meta name="description" content="Step-by-step installation guides for Amazon Firestick, Smart TVs, Android Box, Apple TV, iOS, Windows, and MAG devices using IPTV Smarters or TiviMate.">
+
+  <meta name="keywords" content="IPTV setup guide, install IPTV Firestick, IPTV Smarters setup, TiviMate tutorial, M3U setup">
+
+  <!-- Favicons & Platform Icons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#080B14">
+  <meta name="msapplication-TileColor" content="#080B14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Luna Stream">
+
+  <!-- OpenGraph Social Sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Luna Stream IPTV">
+  <meta property="og:title" content="Device Setup & Installation Tutorials - Luna Stream IPTV">
+  <meta property="og:description" content="Step-by-step installation guides for Amazon Firestick, Smart TVs, Android Box, Apple TV, iOS, Windows, and MAG devices using IPTV Smarters or TiviMate.">
+  <meta property="og:url" content="https://lunaentertainment.online/setup.html">
+  <meta property="og:image" content="https://lunaentertainment.online/assets/images/og-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_GB">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@LunaStreamVIP">
+  <meta name="twitter:title" content="Device Setup & Installation Tutorials - Luna Stream IPTV">
+  <meta name="twitter:description" content="Step-by-step installation guides for Amazon Firestick, Smart TVs, Android Box, Apple TV, iOS, Windows, and MAG devices using IPTV Smarters or TiviMate.">
+  <meta name="twitter:image" content="https://lunaentertainment.online/assets/images/og-preview.png">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to Set Up Luna Stream IPTV on Amazon Firestick & Smart TV",
+  "description": "Simple 3-step tutorial to install and connect Luna Stream IPTV on any streaming device.",
+  "step": [
+    {
+      "@type": "HowToStep",
+      "name": "Install Streaming App",
+      "text": "Download IPTV Smarters Pro or TiviMate from the app store or Downloader code."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Enter Credentials",
+      "text": "Enter your Luna Stream Xtream server URL, username, and password received upon order."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Enjoy 4K Streaming",
+      "text": "Channels, sports, and VOD playlists will load automatically into your electronic program guide (EPG)."
+    }
+  ]
+}
+  </script>
+
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'bg-primary': '#080B14',
+            'bg-secondary': '#0C111D',
+            'bg-card': '#101522',
+            'bg-elevated': '#161D2D',
+            'border-primary': '#263247',
+            brand: {
+              blue: '#3B82F6',
+              'blue-hover': '#2563EB',
+              violet: '#7C3AED',
+              cyan: '#22D3EE',
+              dark: '#080B14',
+              secondary: '#0C111D',
+              card: '#101522',
+              elevated: '#161D2D',
+              border: '#263247'
+            },
+            status: {
+              success: '#22C55E',
+              warning: '#F59E0B',
+              error: '#EF4444',
+              info: '#3B82F6'
+            }
+          },
+          fontFamily: {
+            heading: ['Outfit', 'sans-serif'],
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+    }
+  </script>
+
+  <!-- Custom CSS -->
+    <!-- Google Fonts Preconnect & Stylesheet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-[#080B14] text-slate-100 antialiased min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
+
+  <!-- Ambient Glow Background Blobs -->
+  <div class="blob blob-blue w-96 h-96 top-0 left-1/4 -translate-x-1/2"></div>
+  <div class="blob blob-purple w-96 h-96 top-96 right-10"></div>
+
+  <!-- HEADER -->
+  <header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#080B14]/90 backdrop-blur-md border-b border-[#263247]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <a href="index.html" class="flex items-center space-x-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M4 6.75A2.75 2.75 0 016.75 4h10.5A2.75 2.75 0 0120 6.75v10.5A2.75 2.75 0 0117.25 20H6.75A2.75 2.75 0 014 17.25V6.75zM8.5 8.75a.75.75 0 00-.75.75v5a.75.75 0 001.17.616l4.25-2.5a.75.75 0 000-1.232l-4.25-2.5A.75.75 0 008.5 8.75z"/>
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-heading font-extrabold text-xl sm:text-2xl tracking-tight text-white flex items-center gap-1.5">
+              LUNA <span class="text-blue-500">STREAM</span>
+              <span class="pulse-dot ml-1" title="Servers Online"></span>
+            </span>
+            <span class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold -mt-1">4K Ultra IPTV</span>
+          </div>
+        </a>        <!-- Desktop Navigation Links -->
+        <nav class="hidden lg:flex items-center space-x-6 xl:space-x-7 text-sm font-medium text-slate-300">
+          <a href="index.html" class="hover:text-blue-400 transition-colors">Home</a>
+          <a href="pricing.html" class="hover:text-blue-400 transition-colors">Pricing & Plans</a>
+          <a href="sports.html" class="hover:text-blue-400 transition-colors flex items-center gap-1.5 text-amber-300 font-semibold">
+            <span>⚽ Sports Hub</span>
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+            </span>
+          </a>
+          <a href="setup.html" class="text-blue-400 font-bold border-b-2 border-blue-500 pb-1">Setup Guide</a>
+          <a href="portal.html" class="hover:text-blue-400 transition-colors">Client Portal</a>
+          <a href="contact.html" class="hover:text-blue-400 transition-colors">Support</a>
+        </nav>
+
+        <!-- Right Quick Actions -->
+        <div class="hidden lg:flex items-center space-x-4 ml-6 shrink-0">
+          <a href="checkout.html" class="btn-primary px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider text-white flex items-center gap-2">
+            <span>Order Pass</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </a>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="lg:hidden p-2.5 rounded-xl bg-slate-800/80 text-slate-300 hover:text-blue-400 border border-[#263247]/60 focus:outline-none" aria-label="Open Navigation">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Backdrop -->
+  <div id="drawer-backdrop" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300"></div>
+
+  <!-- Mobile Navigation Drawer -->
+  <div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-[#101522]/95 border-l border-[#263247] z-50 transform translate-x-full transition-transform duration-300 ease-in-out p-6 flex flex-col justify-between">
+    <div>
+      <div class="flex items-center justify-between pb-6 border-b border-[#263247]">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-lg bg-cyan-500 flex items-center justify-center font-bold text-white text-sm">⚡</div>
+          <span class="font-heading font-bold text-lg text-white">Luna Stream</span>
+        </div>
+        <button id="mobile-menu-close" aria-label="Close Navigation Menu" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <nav class="mt-8 flex flex-col space-y-4">
+        <a href="index.html" class="drawer-link text-lg font-semibold text-slate-300 hover:text-blue-400 py-2 border-b border-slate-900">Home</a>
+        <a href="pricing.html" class="drawer-link text-lg font-semibold text-slate-300 hover:text-blue-400 py-2 border-b border-slate-900">Subscription Plans</a>
+        <a href="sports.html" class="drawer-link text-lg font-semibold text-amber-300 hover:text-amber-200 py-2 border-b border-slate-900">⚽ Live Sports Hub</a>
+        <a href="setup.html" class="drawer-link text-lg font-semibold text-cyan-400 py-2 border-b border-slate-900">Setup Tutorials</a>
+        <a href="portal.html" class="drawer-link text-lg font-semibold text-slate-300 hover:text-blue-400 py-2 border-b border-slate-900">Client Portal</a>
+        <a href="contact.html" class="drawer-link text-lg font-semibold text-slate-300 hover:text-blue-400 py-2 border-b border-slate-900">Contact & Support</a>
+      </nav>
+    </div>
+
+    <div class="space-y-3 pt-6 border-t border-[#263247]">
+      <button class="open-trial-modal w-full py-3 rounded-xl border border-cyan-500/40 text-cyan-400 font-bold text-sm bg-cyan-500/10">
+        ⚡ Claim 24H Free Trial
+      </button>
+      <a href="checkout.html" class="btn-primary text-white w-full py-3 rounded-xl text-center block text-sm font-extrabold text-white">
+        Get Instant Pass
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-grow pt-28 sm:pt-36 pb-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Page Header -->
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <span class="text-xs font-extrabold uppercase tracking-widest text-blue-400">Step-by-Step Installation</span>
+        <h1 class="text-4xl sm:text-6xl font-extrabold font-heading text-white mt-2">
+          Device Setup Tutorials
+        </h1>
+        <p class="text-slate-400 text-sm sm:text-base mt-4">
+          Select your device below to view easy instructions on installing and loading your Luna Stream IPTV subscription in under 3 minutes.
+        </p>
+      </div>
+
+      <!-- Device Tab Navigation Bar -->
+      <div class="flex flex-wrap items-center justify-center gap-3 mb-12">
+        <button class="setup-tab-btn active px-5 py-3 rounded-xl text-xs sm:text-sm font-bold border border-blue-500 bg-blue-600/10 text-blue-400 shadow-lg transition-all flex items-center gap-2" data-target="firestick">
+          <span>🔥</span> Amazon FireStick / Android TV
+        </button>
+        <button class="setup-tab-btn px-5 py-3 rounded-xl text-xs sm:text-sm font-bold border border-[#263247] bg-[#101522] text-slate-400 hover:text-white transition-all flex items-center gap-2" data-target="smarttv">
+          <span>📺</span> Smart TVs (Samsung & LG)
+        </button>
+        <button class="setup-tab-btn px-5 py-3 rounded-xl text-xs sm:text-sm font-bold border border-[#263247] bg-[#101522] text-slate-400 hover:text-white transition-all flex items-center gap-2" data-target="apple">
+          <span>🍏</span> Apple TV & iOS (iPhone/iPad)
+        </button>
+        <button class="setup-tab-btn px-5 py-3 rounded-xl text-xs sm:text-sm font-bold border border-[#263247] bg-[#101522] text-slate-400 hover:text-white transition-all flex items-center gap-2" data-target="mag">
+          <span>📟</span> MAG Box & Enigma2
+        </button>
+        <button class="setup-tab-btn px-5 py-3 rounded-xl text-xs sm:text-sm font-bold border border-[#263247] bg-[#101522] text-slate-400 hover:text-white transition-all flex items-center gap-2" data-target="pc">
+          <span>💻</span> Windows PC & MacOS
+        </button>
+      </div>
+
+      <!-- ==========================================
+           GUIDE 1: FIRESTICK & ANDROID TV
+           ========================================== -->
+      <div id="firestick" class="scroll-mt-32"></div>
+      <div id="guide-firestick" class="device-guide-content block space-y-8">
+        <div class="glass-panel rounded-3xl p-6 sm:p-10 border border-[#263247] bg-[#101522]">
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#263247]">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-blue-600/10 text-blue-400 flex items-center justify-center text-2xl">🔥</div>
+              <div>
+                <h2 class="text-2xl font-bold font-heading text-white">Amazon FireStick & Android TV Setup</h2>
+                <p class="text-xs text-slate-400">Recommended App: <strong>IPTV Smarters Pro</strong> or <strong>TiviMate IPTV Player</strong></p>
+              </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Estimated Time: 3 Mins</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            
+            <!-- Step 1 -->
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247] relative">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">1</div>
+              <h3 class="font-bold text-base text-white mb-2">Install "Downloader" App</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                On your FireStick home screen, go to <strong>Find > Search</strong>, type <span class="text-blue-300 font-mono">Downloader</span>, and click download/install.
+              </p>
+              <div class="p-3 rounded-xl bg-[#0C111D]/80 border border-[#263247] text-[11px] text-slate-400">
+                💡 <em>Tip:</em> Enable Developer Options under <strong>Settings > My Fire TV > Developer Options > Install unknown apps</strong>.
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247] relative">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">2</div>
+              <h3 class="font-bold text-base text-white mb-2">Enter Downloader Code</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                Open Downloader, click the URL bar, type one of our direct numeric shortcodes below, and click <strong>Go</strong>:
+              </p>
+              <div class="space-y-2">
+                <div class="flex items-center justify-between p-2.5 rounded-lg bg-[#0C111D] border border-[#263247]">
+                  <span class="text-xs font-mono font-bold text-cyan-300">78522</span>
+                  <button class="btn-copy text-[10px] font-bold text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800" data-copy="78522">Copy Code</button>
+                </div>
+                <span class="text-[11px] text-slate-500 block text-center">Installs IPTV Smarters Pro 4K</span>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247] relative">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">3</div>
+              <h3 class="font-bold text-base text-white mb-2">Log in with Xtream API</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-3">
+                Open IPTV Smarters, select <strong>"Login with Xtream Codes API"</strong>, and enter the details from your activation email/WhatsApp:
+              </p>
+              <div class="p-3 rounded-xl bg-[#0C111D] border border-[#263247] text-[11px] space-y-1 font-mono text-slate-300">
+                <div><strong>Name:</strong> Luna Stream</div>
+                <div><strong>Server URL:</strong> http://line.lunaentertainment.online:8080</div>
+                <div><strong>Username:</strong> [Your Email/User]</div>
+                <div><strong>Password:</strong> [Your Password]</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-[#263247] flex flex-wrap items-center justify-between gap-4">
+            <div class="text-xs text-slate-400">
+              Need assistance? Our engineers can guide you live over chat.
+            </div>
+            <a href="https://wa.me/447413469398?text=Hello!+I+need+help+setting+up+Luna+Stream+on+my+Amazon+FireStick." target="_blank" class="btn-whatsapp px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2">
+              <span>Get FireStick Help on WhatsApp</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           GUIDE 2: SMART TVS (SAMSUNG & LG)
+           ========================================== -->
+      <div id="smarttv" class="scroll-mt-32"></div>
+      <div id="guide-smarttv" class="device-guide-content hidden space-y-8">
+        <div class="glass-panel rounded-3xl p-6 sm:p-10 border border-[#263247] bg-[#101522]">
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#263247]">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-blue-600/10 text-blue-400 flex items-center justify-center text-2xl">📺</div>
+              <div>
+                <h2 class="text-2xl font-bold font-heading text-white">Samsung Tizen & LG WebOS Smart TV Setup</h2>
+                <p class="text-xs text-slate-400">Recommended Apps: <strong>IBO Player</strong>, <strong>BOB Player</strong>, or <strong>Smart IPTV</strong></p>
+              </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Estimated Time: 4 Mins</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247]">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">1</div>
+              <h3 class="font-bold text-base text-white mb-2">Install IBO Player</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Open the <strong>Samsung App Store</strong> or <strong>LG Content Store</strong> on your Smart TV, search for <span class="text-cyan-300 font-bold">IBO Player</span>, and install it.
+              </p>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247]">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">2</div>
+              <h3 class="font-bold text-base text-white mb-2">Find Your Device MAC & Key</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-3">
+                Open the app on your TV. Note down the <strong>Device MAC Address</strong> (e.g., <code class="text-cyan-300">aa:bb:cc:11:22:33</code>) and <strong>Device Key</strong> displayed on your screen.
+              </p>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247]">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">3</div>
+              <h3 class="font-bold text-base text-white mb-2">Send Details to Support</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-3">
+                Simply forward your MAC and Device Key to our WhatsApp support, and we will upload the 20,000+ channels and VOD directly into your TV in 60 seconds!
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-[#263247] flex flex-wrap items-center justify-between gap-4">
+            <div class="text-xs text-slate-400">
+              You can also upload your playlist yourself at <span class="text-blue-300 font-mono">iboplayer.com/device/login</span>
+            </div>
+            <a href="https://wa.me/447413469398?text=Hello+Luna+Stream!+Here+is+my+Smart+TV+IBO+Player+MAC+and+Key+for+activation." target="_blank" class="btn-whatsapp px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2">
+              <span>Send TV MAC to WhatsApp</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           GUIDE 3: APPLE TV & IOS
+           ========================================== -->
+      <div id="apple" class="scroll-mt-32"></div>
+      <div id="guide-apple" class="device-guide-content hidden space-y-8">
+        <div class="glass-panel rounded-3xl p-6 sm:p-10 border border-[#263247] bg-[#101522]">
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#263247]">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-blue-600/10 text-blue-400 flex items-center justify-center text-2xl">🍏</div>
+              <div>
+                <h2 class="text-2xl font-bold font-heading text-white">Apple TV, iPhone & iPad (iOS) Setup</h2>
+                <p class="text-xs text-slate-400">Recommended Apps: <strong>Smarters Player Lite</strong>, <strong>GSE Smart IPTV</strong>, or <strong>IPTVX</strong></p>
+              </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Estimated Time: 2 Mins</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247]">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">1</div>
+              <h3 class="font-bold text-base text-white mb-2">Install from App Store</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Open the official iOS or Apple TV App Store and download <strong>"Smarters Player Lite"</strong> or <strong>"IPTVX"</strong>.
+              </p>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247]">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">2</div>
+              <h3 class="font-bold text-base text-white mb-2">Choose Login Method</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Launch the application and select <strong>"Add User"</strong> &rarr; <strong>"Login with Xtream Codes API"</strong>.
+              </p>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247]">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">3</div>
+              <h3 class="font-bold text-base text-white mb-2">Enter Credentials & Enjoy</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Input your Server URL, Username, and Password provided in your subscription email, then click <strong>Add User</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           GUIDE 4: MAG BOX & ENIGMA2
+           ========================================== -->
+      <div id="mag" class="scroll-mt-32"></div>
+      <div id="guide-mag" class="device-guide-content hidden space-y-8">
+        <div class="glass-panel rounded-3xl p-6 sm:p-10 border border-[#263247] bg-[#101522]">
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#263247]">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-blue-600/10 text-blue-400 flex items-center justify-center text-2xl">📟</div>
+              <div>
+                <h2 class="text-2xl font-bold font-heading text-white">MAG 250/254/322/420 & Enigma2 Setup</h2>
+                <p class="text-xs text-slate-400">Portal Protocol: <strong>Stalker Middleware</strong></p>
+              </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Estimated Time: 3 Mins</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247]">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">1</div>
+              <h3 class="font-bold text-base text-white mb-2">Open MAG Settings</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Go to <strong>Settings > System Settings > Servers > Portals</strong> on your MAG box remote control.
+              </p>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247]">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">2</div>
+              <h3 class="font-bold text-base text-white mb-2">Enter Portal URL</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-3">
+                Set Portal 1 Name to <strong>Luna Stream</strong> and enter the portal URL:
+              </p>
+              <div class="p-2.5 rounded-lg bg-[#0C111D] border border-[#263247] flex items-center justify-between">
+                <span class="text-[11px] font-mono text-cyan-300">http://mag.lunaentertainment.online:8080/c/</span>
+                <button class="btn-copy text-[10px] font-bold text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-800" data-copy="http://mag.lunaentertainment.online:8080/c/">Copy</button>
+              </div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247]">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">3</div>
+              <h3 class="font-bold text-base text-white mb-2">Register MAG MAC</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Send your MAC address (starting with <code class="text-cyan-300">00:1A:79:...</code> located underneath the MAG box) to our WhatsApp/Telegram support.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           GUIDE 5: WINDOWS PC & MACOS
+           ========================================== -->
+      <div id="pc" class="scroll-mt-32"></div>
+      <div id="guide-pc" class="device-guide-content hidden space-y-8">
+        <div class="glass-panel rounded-3xl p-6 sm:p-10 border border-[#263247] bg-[#101522]">
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#263247]">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-blue-600/10 text-blue-400 flex items-center justify-center text-2xl">💻</div>
+              <div>
+                <h2 class="text-2xl font-bold font-heading text-white">Windows PC & MacOS Laptop Setup</h2>
+                <p class="text-xs text-slate-400">Recommended: <strong>IPTV Smarters Desktop</strong> or <strong>VLC Media Player</strong></p>
+              </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Estimated Time: 2 Mins</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247]">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">1</div>
+              <h3 class="font-bold text-base text-white mb-2">Download Player App</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Download <strong>IPTV Smarters Pro .exe</strong> for Windows or <strong>.dmg</strong> for Mac, or use VLC Media Player.
+              </p>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247]">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">2</div>
+              <h3 class="font-bold text-base text-white mb-2">Load M3U or Xtream API</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                In VLC: Click <strong>Media > Open Network Stream</strong> and paste your M3U link. In Smarters: enter your server URL and login credentials.
+              </p>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 border border-[#263247]">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">3</div>
+              <h3 class="font-bold text-base text-white mb-2">Browser Web Player</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                You can also stream directly in Google Chrome, Edge, or Safari without installing anything using our web player portal.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           TROUBLESHOOTING & OPTIMIZATION TIPS
+           ========================================== -->
+      <div class="mt-16 max-w-4xl mx-auto">
+        <div class="text-center mb-8">
+          <span class="text-xs font-extrabold uppercase tracking-widest text-blue-400">Pro Tips</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold font-heading text-white mt-1">
+            Troubleshooting & Optimization
+          </h2>
+        </div>
+
+        <div class="space-y-4">
+          <div class="glass-panel rounded-xl border border-[#263247] overflow-hidden">
+            <button class="trouble-trigger w-full px-6 py-4 text-left flex items-center justify-between font-semibold text-white hover:text-blue-400 transition-colors">
+              <span>Experiencing ISP buffering or slowdowns during big games?</span>
+              <svg class="trouble-icon w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="hidden px-6 pb-4 text-xs text-slate-400 leading-relaxed">
+              Some ISPs throttle streaming servers during live sports. You can resolve this instantly by changing your router DNS to Cloudflare (<strong>1.1.1.1</strong>) or Google DNS (<strong>8.8.8.8</strong>), or enabling a VPN.
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-xl border border-[#263247] overflow-hidden">
+            <button class="trouble-trigger w-full px-6 py-4 text-left flex items-center justify-between font-semibold text-white hover:text-blue-400 transition-colors">
+              <span>How to change Stream Format from MPEGTS to HLS?</span>
+              <svg class="trouble-icon w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="hidden px-6 pb-4 text-xs text-slate-400 leading-relaxed">
+              In IPTV Smarters Pro or TiviMate, go to <strong>Settings > Stream Format</strong> and change it from <em>Default / TS</em> to <em>HLS (.m3u8)</em>. This enhances buffer stability on slower Wi-Fi connections.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-[#101522] border-t border-slate-900 pt-16 pb-24 md:pb-12 text-slate-400 text-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+        <div class="space-y-4">
+          <a href="index.html" class="flex items-center space-x-2">
+            <div class="w-8 h-8 rounded-lg bg-cyan-500 flex items-center justify-center font-bold text-white text-sm">⚡</div>
+            <span class="font-heading font-extrabold text-xl text-white">LUNA <span class="text-blue-500">STREAM</span></span>
+          </a>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            The world's highest reliability 4K IPTV platform. Zero buffering, ultra-low latency, and 24/7 VIP technical support.
+          </p>
+        </div>
+        <div>
+          <h4 class="font-heading font-bold text-white mb-4 uppercase text-xs tracking-wider">Quick Links</h4>
+          <ul class="space-y-2.5 text-xs">
+            <li><a href="index.html" class="hover:text-blue-400 transition-colors">Home Page</a></li>
+            <li><a href="pricing.html" class="hover:text-blue-400 transition-colors">Subscription Packages</a></li>
+            <li><a href="setup.html" class="hover:text-blue-400 transition-colors">Device Setup Tutorials</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-heading font-bold text-white mb-4 uppercase text-xs tracking-wider">Supported Devices</h4>
+          <ul class="space-y-2.5 text-xs">
+            <li><a href="setup.html#firestick" class="hover:text-blue-400 transition-colors">Amazon FireStick 4K</a></li>
+            <li><a href="setup.html#smarttv" class="hover:text-blue-400 transition-colors">Samsung / LG Smart TV</a></li>
+            <li><a href="setup.html#apple" class="hover:text-blue-400 transition-colors">Apple TV & iPhone (iOS)</a></li>
+            <li><a href="setup.html#mag" class="hover:text-blue-400 transition-colors">MAG Box Stalker Portal</a></li>
+            <li><a href="setup.html#pc" class="hover:text-blue-400 transition-colors">Windows PC & MacOS</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-heading font-bold text-white mb-4 uppercase text-xs tracking-wider">Need Setup Help?</h4>
+          <p class="text-xs text-slate-500 mb-4">Our engineers are available on WhatsApp to guide you step-by-step:</p>
+          <a href="https://wa.me/447413469398?text=Hello+Luna+Stream+Support!+I+need+help+setting+up+my+device." target="_blank" class="btn-whatsapp w-full py-2.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2">
+            <span>Live WhatsApp Assistance</span>
+          </a>
+        </div>
+      </div>
+      <div class="border-t border-slate-900 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-600 gap-4">
+        <p>&copy; 2026 Luna Stream IPTV. All rights reserved.</p>
+        <div class="flex flex-wrap items-center gap-3">
+          <a href="portal.html" class="hover:text-blue-400 transition-colors">Client Portal</a>
+          <span>•</span>
+          <a href="pricing.html" class="hover:text-blue-400 transition-colors">Pricing</a>
+          <span>•</span>
+          <a href="terms.html" class="hover:text-blue-400 transition-colors">Terms</a>
+          <span>•</span>
+          <a href="privacy.html" class="hover:text-blue-400 transition-colors">Privacy</a>
+          <span>•</span>
+          <a href="refund.html" class="hover:text-blue-400 transition-colors">Refund Policy</a>
+          <span>•</span>
+          <a href="contact.html" class="hover:text-blue-400 transition-colors">Support</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating Mobile Action -->
+  <div class="md:hidden mobile-sticky-cta flex items-center gap-3">
+    <button class="open-trial-modal flex-1 py-2.5 rounded-xl border border-cyan-500/40 text-cyan-400 font-bold text-xs bg-cyan-500/10">
+      ⚡ 24h Free Trial
+    </button>
+    <a href="checkout.html" class="btn-primary text-white flex-1 py-2.5 rounded-xl text-center text-xs font-extrabold text-white">
+      Order Pass
+    </a>
+  </div>
+
+  <!-- Free Trial Modal -->
+  <div id="trial-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div id="trial-backdrop" class="fixed inset-0 bg-black/80 backdrop-blur-sm"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-2xl max-w-md w-full p-6 sm:p-8 border border-[#263247] shadow-2xl z-10">
+      <div class="flex items-center justify-between pb-4 border-b border-[#263247]">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">⚡</span>
+          <h3 class="font-heading font-bold text-lg text-white">Claim 24-Hour Free Trial</h3>
+        </div>
+        <button id="close-trial-modal" aria-label="Close Trial Modal" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="trial-form" class="mt-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Delivery Email Address</label>
+          <input type="email" required placeholder="your.name@example.com" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Your Streaming Device</label>
+          <select name="device" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+            <option value="Amazon FireStick">Amazon FireStick 4K / Lite</option>
+            <option value="Smart TV (Samsung/LG)">Samsung / LG Smart TV</option>
+            <option value="Android TV / Box">Android TV Box / Google TV</option>
+            <option value="Apple TV / iOS">Apple TV / iPhone / iPad</option>
+            <option value="MAG Box">MAG Box / Stalker</option>
+            <option value="Windows / Mac">Windows PC / MacOS</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary text-white w-full py-3 rounded-xl text-xs uppercase tracking-wider font-extrabold text-white mt-2">
+          Generate Trial Line
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/tracker.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/setup.js"></script>
+</body>
+</html>
+
+

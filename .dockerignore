@@ -1,0 +1,4 @@
+backups/
+scripts/legacy/
+.git/
+*.log

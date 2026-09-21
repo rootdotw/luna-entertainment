@@ -1,0 +1,50 @@
+{
+  "name": "Luna Stream IPTV - Premium 4K Streaming",
+  "short_name": "Luna Stream",
+  "description": "Premium 4K & 8K IPTV streaming platform with 20,000+ live channels, PPV sports, and VOD movies.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#080B14",
+  "theme_color": "#080B14",
+  "categories": [
+    "entertainment",
+    "video",
+    "sports"
+  ],
+  "icons": [
+    {
+      "src": "/assets/images/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/images/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/images/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/images/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/images/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/images/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

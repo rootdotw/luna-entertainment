@@ -1,0 +1,29 @@
+# robots.txt for Luna Stream IPTV (https://lunaentertainment.online)
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /pricing.html
+Allow: /sports.html
+Allow: /setup.html
+Allow: /checkout.html
+Allow: /contact.html
+Allow: /terms.html
+Allow: /privacy.html
+Allow: /refund.html
+Allow: /assets/
+Allow: /sitemap.xml
+Allow: /site.webmanifest
+Allow: /favicon.ico
+
+# Disallow private operational dashboards, API endpoints, customer data & flat database
+Disallow: /data/
+Disallow: /admin.html
+Disallow: /admin
+Disallow: /portal.html
+Disallow: /api/admin/
+Disallow: /api/customer/
+Disallow: /*.json$
+Disallow: /*.ps1$
+
+# XML Sitemap Index
+Sitemap: https://lunaentertainment.online/sitemap.xml
