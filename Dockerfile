@@ -8,9 +8,9 @@ RUN apt-get update && apt-get install -y ca-certificates curl && rm -rf /var/lib
 # Copy website files and backend
 COPY . .
 
-# Koyeb and standard cloud hosts default to port 8080
-ENV PORT=8080
-EXPOSE 8080
+# Render standard port
+ENV PORT=10000
+EXPOSE 10000
 
 # Launch server
-CMD ["pwsh", "-NoProfile", "-File", "./serve.ps1", "-Port", "8080"]
+CMD ["pwsh", "-NoProfile", "-File", "./serve.ps1", "-Port", "10000"]

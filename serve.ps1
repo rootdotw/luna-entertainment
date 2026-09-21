@@ -914,36 +914,43 @@ function Send-StaticFile($response, [string]$filePath, [string]$mime) {
     } catch {}
 }
 
+$isLinux = ($PSVersionTable.Platform -eq "Unix") -or ($PSVersionTable.OS -like "*Linux*") -or ($null -ne $env:RENDER) -or [System.Environment]::OSVersion.Platform.ToString().ToLower().Contains("unix")
 $listener = New-Object System.Net.HttpListener
-$listener.Prefixes.Add("http://localhost:$Port/")
-$listener.Prefixes.Add("http://127.0.0.1:$Port/")
-try { $listener.Prefixes.Add("http://*:$Port/") } catch {}
-try { $listener.Prefixes.Add("http://+:$Port/") } catch {}
-try {
-    $localIps = [System.Net.Dns]::GetHostAddresses([System.Net.Dns]::GetHostName()) | Where-Object { $_.AddressFamily -eq 'InterNetwork' }
-    foreach ($ip in $localIps) {
-        $ipStr = $ip.ToString()
-        if ($ipStr -ne '127.0.0.1') {
-            try { $listener.Prefixes.Add("http://${ipStr}:$Port/") } catch {}
+
+if ($isLinux) {
+    try {
+        $listener.Prefixes.Add("http://*:$Port/")
+        $listener.Start()
+    } catch {
+        try {
+            $listener = New-Object System.Net.HttpListener
+            $listener.Prefixes.Add("http://+:$Port/")
+            $listener.Start()
+        } catch {
+            $listener = New-Object System.Net.HttpListener
+            $listener.Prefixes.Add("http://0.0.0.0:$Port/")
+            $listener.Start()
         }
     }
-} catch {}
-try {
-    $listener.Start()
-} catch {
-    # Fallback strictly to localhost if LAN/wildcard IP prefix lacked permissions
-    $listener = New-Object System.Net.HttpListener
-    $listener.Prefixes.Add("http://localhost:$Port/")
-    $listener.Prefixes.Add("http://127.0.0.1:$Port/")
-    $listener.Start()
+} else {
+    try {
+        $listener.Prefixes.Add("http://localhost:$Port/")
+        $listener.Prefixes.Add("http://127.0.0.1:$Port/")
+        $listener.Start()
+    } catch {
+        $listener = New-Object System.Net.HttpListener
+        $listener.Prefixes.Add("http://127.0.0.1:$Port/")
+        $listener.Start()
+    }
 }
 
 Invoke-DataMigration
 Invoke-ExpiryCheck -force
 
+$listenHost = if ($isLinux) { "0.0.0.0" } else { "localhost" }
 Write-Host "=================================================="
 Write-Host "Luna Stream IPTV - High Performance Backend Server"
-Write-Host "Listening at: http://localhost:$Port/"
+Write-Host "Listening at: http://${listenHost}:$Port/"
 Write-Host "=================================================="
 
 try {
