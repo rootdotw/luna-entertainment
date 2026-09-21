@@ -195,6 +195,28 @@ function Add-AuditLog([string]$action, [string]$actor, [string]$details) {
     Write-JsonFileSafe "audit_log.json" $log
 }
 
+function Initialize-DefaultData() {
+    $s = Read-JsonFileSafe "settings.json" $null
+    if (-not $s) {
+        $s = @{
+            admin_password = Get-PasswordHash "admin"
+            auth_token = "ps_sec_token_99281a8b"
+            brand_name = "Luna Stream IPTV"
+            m3u_server_template = "http://line.lunaentertainment.online:8080/get.php?username={username}&password={password}&type=m3u_plus&output=ts"
+            xtream_server_url = "http://line.lunaentertainment.online:8080"
+            support_whatsapp = "447413469398"
+            support_telegram = "LunaStreamOfficial"
+            paypal_email = "wasifali740@gmail.com"
+            paypal_me_link = "https://paypal.me/adilfarooq909"
+            paypal_mode = "paypal_me"
+            paypal_instructions = "Send exact amount to paypal.me/adilfarooq909. 256-Bit SSL Instant Verification."
+            announcement_enabled = $false
+        }
+        Write-JsonFileSafe "settings.json" $s
+    }
+}
+Initialize-DefaultData
+
 # --- Server-Side Pricing Catalog (Authoritative & Dynamic) ---
 $script:PRICING_CATALOG = @{
     '3m' = @{
@@ -1007,10 +1029,16 @@ try {
                     }
                     $settings = Read-JsonFileSafe "settings.json" @{}
                     $providedPass = if ($bodyJson) { $bodyJson.password } else { "" }
+                    $targetPass = if ($settings.admin_password) { $settings.admin_password } else { "admin" }
                     
-                    if (Test-PasswordHash $providedPass $settings.admin_password) {
-                        if (-not $settings.admin_password.Contains(':')) {
+                    if (Test-PasswordHash $providedPass $targetPass) {
+                        if (-not $settings.admin_password -or -not $settings.admin_password.Contains(':')) {
                             $settings.admin_password = Get-PasswordHash $providedPass
+                            if (-not $settings.brand_name) { $settings.brand_name = "Luna Stream IPTV" }
+                            if (-not $settings.support_whatsapp) { $settings.support_whatsapp = "447413469398" }
+                            if (-not $settings.support_telegram) { $settings.support_telegram = "LunaStreamOfficial" }
+                            if (-not $settings.paypal_me_link) { $settings.paypal_me_link = "https://paypal.me/adilfarooq909" }
+                            if (-not $settings.paypal_mode) { $settings.paypal_mode = "paypal_me" }
                             Write-JsonFileSafe "settings.json" $settings
                         }
                         $token = New-SessionToken
