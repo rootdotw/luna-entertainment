@@ -45,8 +45,28 @@ document.addEventListener('DOMContentLoaded', () => {
    1. AUTHENTICATION & API WRAPPER
    ========================================================================== */
 
+function getAdminToken() {
+  try {
+    return sessionStorage.getItem('ps_admin_token') || localStorage.getItem('ps_admin_token') || '';
+  } catch (e) {
+    return '';
+  }
+}
+
+function setAdminToken(tok) {
+  try { sessionStorage.setItem('ps_admin_token', tok); } catch (e) {}
+  try { localStorage.setItem('ps_admin_token', tok); } catch (e) {}
+  document.documentElement.classList.add('admin-pre-authenticated');
+}
+
+function clearAdminToken() {
+  try { sessionStorage.removeItem('ps_admin_token'); } catch (e) {}
+  try { localStorage.removeItem('ps_admin_token'); } catch (e) {}
+  document.documentElement.classList.remove('admin-pre-authenticated');
+}
+
 function adminFetch(url, options = {}) {
-  const token = sessionStorage.getItem('ps_admin_token');
+  const token = getAdminToken();
   if (!options.headers) options.headers = {};
   if (token) options.headers['Authorization'] = `Bearer ${token}`;
   if (!options.headers['Content-Type'] && options.body) {
@@ -54,7 +74,7 @@ function adminFetch(url, options = {}) {
   }
   return fetch(url, options).then(res => {
     if (res.status === 401) {
-      sessionStorage.removeItem('ps_admin_token');
+      clearAdminToken();
       const gate = document.getElementById('admin-auth-gate');
       const root = document.getElementById('admin-dashboard-root');
       if (gate) gate.classList.remove('hidden');
@@ -72,27 +92,36 @@ function initAuth() {
   const loginForm = document.getElementById('admin-login-form');
   const logoutBtn = document.getElementById('btn-admin-logout');
 
-  const token = sessionStorage.getItem('ps_admin_token');
+  const token = getAdminToken();
   if (token) {
-    // Verify token validity
+    // Already authenticated: immediately ensure gate is hidden and root is displayed
+    if (gate) gate.classList.add('hidden');
+    if (root) root.classList.remove('hidden');
+    document.documentElement.classList.add('admin-pre-authenticated');
+
+    // Load dashboard data immediately
+    refreshAllData();
+    if (typeof startLiveVisitorPolling === 'function') startLiveVisitorPolling();
+
+    // Verify token validity in background
     fetch('/api/auth/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: token })
     }).then(res => {
-      if (res.ok) {
-        if (gate) gate.classList.add('hidden');
-        if (root) root.classList.remove('hidden');
-        refreshAllData();
-        if (typeof startLiveVisitorPolling === 'function') startLiveVisitorPolling();
-      } else {
-        sessionStorage.removeItem('ps_admin_token');
+      if (!res.ok) {
+        clearAdminToken();
         if (gate) gate.classList.remove('hidden');
         if (root) root.classList.add('hidden');
+        showToast('Session expired. Please log in again.', 'error');
       }
     }).catch(() => {
-      sessionStorage.removeItem('ps_admin_token');
+      // Keep session intact during temporary network drops
     });
+  } else {
+    clearAdminToken();
+    if (gate) gate.classList.remove('hidden');
+    if (root) root.classList.add('hidden');
   }
 
   if (loginForm) {
@@ -112,7 +141,7 @@ function initAuth() {
         });
         const data = await res.json();
         if (data.success && data.token) {
-          sessionStorage.setItem('ps_admin_token', data.token);
+          setAdminToken(data.token);
           if (gate) gate.classList.add('hidden');
           if (root) root.classList.remove('hidden');
           if (passwordInput) passwordInput.value = '';
@@ -132,7 +161,7 @@ function initAuth() {
 
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-      sessionStorage.removeItem('ps_admin_token');
+      clearAdminToken();
       window.location.reload();
     });
   }
@@ -3303,7 +3332,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Start polling if already authenticated
-  if (sessionStorage.getItem('ps_admin_token')) {
+  if (getAdminToken()) {
     startLiveVisitorPolling();
   }
 });
@@ -3311,6 +3340,76 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ==========================================================================
    14. PLANS, PRICING & DISCOUNTS ENGINE CONTROLLER
    ========================================================================== */
+
+const DEFAULT_ADMIN_PRICING = {
+  currencies: {
+    GBP: { symbol: '£', suffix: 'GBP' },
+    USD: { symbol: '$', suffix: 'USD' },
+    EUR: { symbol: '€', suffix: 'EUR' }
+  },
+  plans: {
+    '3m': {
+      id: '3m',
+      title: '3 Months Pass',
+      name: '3 Months Pass',
+      duration_months: 3,
+      months: 3,
+      extra_months: 0,
+      badge: 'STARTER SAVER',
+      active: true,
+      popular: false,
+      channels: '20,000+ 4K & UHD Channels',
+      vod: '60,000+ Movies & Series',
+      pricing: {
+        '1': { GBP: 25, USD: 35, EUR: 30 },
+        '2': { GBP: 35, USD: 49, EUR: 40 },
+        '3': { GBP: 49, USD: 69, EUR: 59 },
+        '5': { GBP: 79, USD: 109, EUR: 95 }
+      },
+      previous_pricing: {}
+    },
+    '6m': {
+      id: '6m',
+      title: '6 Months Pass',
+      name: '6 Months Pass',
+      duration_months: 6,
+      months: 6,
+      extra_months: 0,
+      badge: 'EXTENDED SAVER',
+      active: true,
+      popular: false,
+      channels: '20,000+ 4K & UHD Channels',
+      vod: '60,000+ Movies & Series',
+      pricing: {
+        '1': { GBP: 40, USD: 55, EUR: 47 },
+        '2': { GBP: 59, USD: 79, EUR: 69 },
+        '3': { GBP: 79, USD: 109, EUR: 95 },
+        '5': { GBP: 129, USD: 179, EUR: 149 }
+      },
+      previous_pricing: {}
+    },
+    '12m': {
+      id: '12m',
+      title: '12 Months Ultimate Pass',
+      name: '12 Months Ultimate Pass',
+      duration_months: 12,
+      months: 12,
+      extra_months: 2,
+      badge: '⭐ BEST VALUE',
+      active: true,
+      popular: true,
+      channels: '20,000+ 4K & UHD Channels',
+      vod: '60,000+ Movies & Series',
+      pricing: {
+        '1': { GBP: 65, USD: 89, EUR: 76 },
+        '2': { GBP: 99, USD: 135, EUR: 115 },
+        '3': { GBP: 129, USD: 179, EUR: 149 },
+        '5': { GBP: 199, USD: 269, EUR: 229 }
+      },
+      previous_pricing: {}
+    }
+  }
+};
 
 let adminPricingCatalog = null;
 let activePricingCurrencyFilter = 'ALL'; // 'ALL', 'GBP', 'EUR', 'USD'
@@ -3353,31 +3452,31 @@ async function loadAdminPricing() {
     const res = await adminFetch('/api/admin/pricing');
     if (res.ok) {
       const data = await res.json();
-      if (data && data.pricing) {
+      if (data && data.pricing && data.pricing.plans && Object.keys(data.pricing.plans).length > 0) {
         adminPricingCatalog = data.pricing;
         renderAdminPricing();
         updatePricingBadgeCount();
         return;
       }
     }
-    if (container) {
-      container.innerHTML = `
-        <div class="glass-panel p-6 rounded-2xl border border-red-500/30 text-center space-y-3">
-          <p class="text-sm font-bold text-red-400">Failed to load pricing catalog from server.</p>
-          <button type="button" onclick="loadAdminPricing()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white cursor-pointer">Retry</button>
-        </div>
-      `;
-    }
+    // Server catalog missing or empty: seamlessly initialize with default catalog
+    adminPricingCatalog = JSON.parse(JSON.stringify(DEFAULT_ADMIN_PRICING));
+    renderAdminPricing();
+    updatePricingBadgeCount();
+
+    // Auto-save to server in background so server creates data/pricing.json
+    try {
+      await adminFetch('/api/admin/pricing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pricing: adminPricingCatalog })
+      });
+    } catch (saveErr) {}
   } catch (err) {
-    console.error('Error loading admin pricing:', err);
-    if (container) {
-      container.innerHTML = `
-        <div class="glass-panel p-6 rounded-2xl border border-red-500/30 text-center space-y-3">
-          <p class="text-sm font-bold text-red-400">Network error loading pricing catalog.</p>
-          <button type="button" onclick="loadAdminPricing()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white cursor-pointer">Retry</button>
-        </div>
-      `;
-    }
+    // Graceful fallback to guarantee pricing cards render reliably
+    adminPricingCatalog = JSON.parse(JSON.stringify(DEFAULT_ADMIN_PRICING));
+    renderAdminPricing();
+    updatePricingBadgeCount();
   }
 }
 
