@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <radialGradient id="ogBgGlow" cx="20%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#1E293B" stop-opacity="0.9" />
+      <stop offset="40%" stop-color="#0C111D" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#080B14" />
+    </radialGradient>
+    <radialGradient id="cyanAccent" cx="80%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="#0284C7" stop-opacity="0.3" />
+      <stop offset="60%" stop-color="#080B14" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60A5FA" />
+      <stop offset="50%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#22D3EE" />
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#CBD5E1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="1200" height="630" fill="#080B14" />
+  <rect width="1200" height="630" fill="url(#ogBgGlow)" />
+  <rect width="1200" height="630" fill="url(#cyanAccent)" />
+
+  <!-- Subtle Structural Grid Overlay -->
+  <line x1="0" y1="120" x2="1200" y2="120" stroke="#1E293B" stroke-opacity="0.4" stroke-width="1" />
+  <line x1="0" y1="510" x2="1200" y2="510" stroke="#1E293B" stroke-opacity="0.4" stroke-width="1" />
+  <line x1="100" y1="0" x2="100" y2="630" stroke="#1E293B" stroke-opacity="0.4" stroke-width="1" />
+  <line x1="1100" y1="0" x2="1100" y2="630" stroke="#1E293B" stroke-opacity="0.4" stroke-width="1" />
+
+  <!-- Left Side: Brand Mark -->
+  <g transform="translate(120, 150)">
+    <!-- Glow behind emblem -->
+    <circle cx="165" cy="165" r="150" fill="#3B82F6" opacity="0.2" filter="blur(30px)" />
+    <!-- Icon Container -->
+    <rect width="330" height="330" rx="72" fill="#0C111D" stroke="#263247" stroke-width="4" />
+    <!-- Crescent & Play Mark -->
+    <path d="M 195 72 C 142 74 98 116 98 165 C 98 214 142 256 195 258 C 155 245 125 207 125 165 C 125 123 155 85 195 72 Z" fill="url(#brandGrad)" />
+    <path d="M 160 125 L 225 165 L 160 205 Z" fill="#FFFFFF" />
+    <circle cx="225" cy="165" r="4" fill="#38BDF8" />
+  </g>
+
+  <!-- Right Side: Content & Typography -->
+  <g transform="translate(500, 160)">
+    <!-- Top Pill Tag -->
+    <rect x="0" y="0" width="230" height="36" rx="18" fill="#1E293B" stroke="#3B82F6" stroke-opacity="0.5" stroke-width="1.5" />
+    <circle cx="20" cy="18" r="5" fill="#22C55E" />
+    <text x="36" y="23" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1.5" fill="#93C5FD">PREMIUM IPTV PLATFORM</text>
+
+    <!-- Main Title -->
+    <text x="0" y="95" font-family="'Outfit', sans-serif" font-weight="900" font-size="64" letter-spacing="-1.5" fill="url(#textGrad)">
+      LUNA <tspan fill="url(#brandGrad)">STREAM</tspan>
+    </text>
+
+    <!-- Tagline -->
+    <text x="0" y="145" font-family="'Inter', sans-serif" font-weight="700" font-size="24" fill="#94A3B8">
+      Ultra 4K &amp; 8K Streaming Without Buffering
+    </text>
+
+    <!-- Bullets Grid -->
+    <g transform="translate(0, 185)">
+      <rect x="0" y="0" width="170" height="42" rx="10" fill="#101522" stroke="#263247" stroke-width="1" />
+      <text x="85" y="26" font-family="'Inter', sans-serif" font-weight="700" font-size="13" fill="#E2E8F0" text-anchor="middle">📡 20,000+ Channels</text>
+
+      <rect x="185" y="0" width="170" height="42" rx="10" fill="#101522" stroke="#263247" stroke-width="1" />
+      <text x="270" y="26" font-family="'Inter', sans-serif" font-weight="700" font-size="13" fill="#E2E8F0" text-anchor="middle">🥊 Live Sports &amp; PPV</text>
+
+      <rect x="370" y="0" width="180" height="42" rx="10" fill="#101522" stroke="#263247" stroke-width="1" />
+      <text x="460" y="26" font-family="'Inter', sans-serif" font-weight="700" font-size="13" fill="#E2E8F0" text-anchor="middle">🎬 60,000+ VOD Movies</text>
+    </g>
+
+    <!-- Bottom Highlights -->
+    <g transform="translate(0, 260)">
+      <text x="0" y="20" font-family="'Inter', sans-serif" font-weight="600" font-size="14" fill="#64748B">
+        ⚡ Anti-Freeze Tech  •  99.9% Uptime  •  Instant Activation  •  Firestick &amp; Smart TV Ready
+      </text>
+      <text x="0" y="55" font-family="'Outfit', sans-serif" font-weight="800" font-size="20" fill="#38BDF8">
+        https://lunastream.vip
+      </text>
+    </g>
+  </g>
+
+  <!-- Bottom Accent Line -->
+  <rect x="0" y="624" width="1200" height="6" fill="url(#brandGrad)" />
+</svg>
