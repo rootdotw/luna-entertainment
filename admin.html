@@ -92,6 +92,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
   
+  <!-- Synchronous Pre-Authentication Check (Eliminates login gate flash on reload) -->
+  <script>
+    (function() {
+      try {
+        var token = sessionStorage.getItem('ps_admin_token') || localStorage.getItem('ps_admin_token');
+        if (token && token.length > 10) {
+          document.documentElement.classList.add('admin-pre-authenticated');
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    html.admin-pre-authenticated #admin-auth-gate { display: none !important; }
+    html.admin-pre-authenticated #admin-dashboard-root { display: flex !important; }
+  </style>
 </head>
 <body class="bg-[#080B14] text-slate-100 antialiased min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
 
