@@ -1351,61 +1351,126 @@ try {
                         }
                         Add-AuditLog "CREATE_ORDER" "Admin" "Created order $($newOrder.id)"
                         
-                        Send-JsonResponse $response 201 $newOrder
+                        Send-JsonResponse $response 201 @{ success = $true; order = $newOrder; id = $newOrder.id }
                     } elseif ($method -eq "PATCH") {
                         $targetId = $bodyJson.id
                         $updatedOrder = $null
                         $statusChangedToActive = $false
                         for ($i = 0; $i -lt $orders.Count; $i++) {
                             if ($orders[$i].id -eq $targetId) {
+                                if ($null -ne $bodyJson.customer_name -and [string]$bodyJson.customer_name -ne "") {
+                                    Set-ObjectProperty $orders[$i] 'customer_name' ([string]$bodyJson.customer_name)
+                                }
+                                if ($null -ne $bodyJson.customer_email -and [string]$bodyJson.customer_email -ne "") {
+                                    Set-ObjectProperty $orders[$i] 'customer_email' ([string]$bodyJson.customer_email)
+                                }
+                                if ($null -ne $bodyJson.plan_id -and [string]$bodyJson.plan_id -ne "") {
+                                    Set-ObjectProperty $orders[$i] 'plan_id' ([string]$bodyJson.plan_id)
+                                    $planTitles = @{ '3m' = '3 Months Starter Pass'; '6m' = '6 Months Extended Pass'; '12m' = '12 Months Ultimate Pass' }
+                                    if ($planTitles.ContainsKey([string]$bodyJson.plan_id)) {
+                                        Set-ObjectProperty $orders[$i] 'plan_title' $planTitles[[string]$bodyJson.plan_id]
+                                    }
+                                    $newDur = Get-PlanDurationMonths ([string]$bodyJson.plan_id)
+                                    if ($newDur -gt 0) {
+                                        Set-ObjectProperty $orders[$i] 'duration_months' $newDur
+                                    }
+                                }
+                                if ($null -ne $bodyJson.devices_count) {
+                                    Set-ObjectProperty $orders[$i] 'devices_count' ([int]$bodyJson.devices_count)
+                                }
                                 if ($bodyJson.status) { 
                                     if ($orders[$i].status -ne "Active" -and $bodyJson.status -eq "Active") {
                                         $statusChangedToActive = $true
                                     }
-                                    $orders[$i].status = $bodyJson.status 
+                                    Set-ObjectProperty $orders[$i] 'status' ([string]$bodyJson.status)
+                                    if ($bodyJson.status -eq "Active") {
+                                        Set-ObjectProperty $orders[$i] 'payment_status' 'PAID'
+                                    } elseif ($bodyJson.status -eq "Cancelled") {
+                                        Set-ObjectProperty $orders[$i] 'payment_status' 'CANCELLED'
+                                    }
                                 }
-                                if ($bodyJson.m3u_url) { $orders[$i].m3u_url = $bodyJson.m3u_url }
-                                if ($bodyJson.xtream_username) { $orders[$i].xtream_username = $bodyJson.xtream_username }
-                                if ($bodyJson.xtream_password) { $orders[$i].xtream_password = $bodyJson.xtream_password }
-                                if ($null -ne $bodyJson.notes) { $orders[$i].notes = $bodyJson.notes }
-                                $orders[$i].updated_at = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+                                if ($null -ne $bodyJson.m3u_url) { Set-ObjectProperty $orders[$i] 'm3u_url' ([string]$bodyJson.m3u_url) }
+                                if ($null -ne $bodyJson.xtream_username) { Set-ObjectProperty $orders[$i] 'xtream_username' ([string]$bodyJson.xtream_username) }
+                                if ($null -ne $bodyJson.xtream_password) { Set-ObjectProperty $orders[$i] 'xtream_password' ([string]$bodyJson.xtream_password) }
+                                if ($null -ne $bodyJson.notes) { Set-ObjectProperty $orders[$i] 'notes' ([string]$bodyJson.notes) }
+                                Set-ObjectProperty $orders[$i] 'updated_at' ((Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ"))
                                 $updatedOrder = $orders[$i]
                                 break
                             }
                         }
+
+                        if (-not $updatedOrder) {
+                            Send-JsonResponse $response 404 @{ success = $false; message = "Order not found" }
+                            continue
+                        }
+
+                        if ($statusChangedToActive) {
+                            try {
+                                # Ensure line credentials exist when marked Active
+                                $settings = Read-JsonFileSafe "settings.json" @{}
+                                if (-not $updatedOrder.xtream_username -or -not $updatedOrder.xtream_password) {
+                                    if ($settings.iptv_panel_enabled -and $settings.iptv_panel_auto_fulfill_orders) {
+                                        $panelLine = New-IptvPanelLine $updatedOrder.plan_id $updatedOrder.devices_count $updatedOrder.customer_email
+                                        Set-ObjectProperty $updatedOrder 'xtream_username' $panelLine.xtream_username
+                                        Set-ObjectProperty $updatedOrder 'xtream_password' $panelLine.xtream_password
+                                        Set-ObjectProperty $updatedOrder 'm3u_url' $panelLine.m3u_url
+                                    } else {
+                                        $genUser = "luna_" + (New-SecureId "" 6)
+                                        $genPass = New-SecurePassword 10
+                                        $genM3u = Get-M3UUrl $genUser $genPass
+                                        Set-ObjectProperty $updatedOrder 'xtream_username' $genUser
+                                        Set-ObjectProperty $updatedOrder 'xtream_password' $genPass
+                                        Set-ObjectProperty $updatedOrder 'm3u_url' $genM3u
+                                    }
+                                } elseif (-not $updatedOrder.m3u_url) {
+                                    Set-ObjectProperty $updatedOrder 'm3u_url' (Get-M3UUrl $updatedOrder.xtream_username $updatedOrder.xtream_password)
+                                }
+                            } catch {}
+                        }
+
                         Write-JsonFileSafe "orders.json" $orders
                         
                         if ($statusChangedToActive -and $updatedOrder) {
-                            $customers = [System.Collections.ArrayList]@(Read-JsonFileSafe "customers.json" @())
-                            $subscriptions = [System.Collections.ArrayList]@(Read-JsonFileSafe "subscriptions.json" @())
-                            $payments = [System.Collections.ArrayList]@(Read-JsonFileSafe "payments.json" @())
-                            
-                            $cId = ""
-                            $email = $updatedOrder.customer_email
-                            foreach ($c in $customers) {
-                                if ($c.email -eq $email) {
-                                    $cId = $c.id
-                                    $amt = 0.0
-                                    [double]::TryParse([string]($updatedOrder.total_amount), [ref]$amt) | Out-Null
-                                    $c.lifetime_value += $amt
-                                    break
+                            try {
+                                $customers = [System.Collections.ArrayList]@(Read-JsonFileSafe "customers.json" @())
+                                $subscriptions = [System.Collections.ArrayList]@(Read-JsonFileSafe "subscriptions.json" @())
+                                $payments = [System.Collections.ArrayList]@(Read-JsonFileSafe "payments.json" @())
+                                
+                                $cId = ""
+                                $email = [string]$updatedOrder.customer_email
+                                $amt = 0.0
+                                [double]::TryParse([string]($updatedOrder.total_amount), [ref]$amt) | Out-Null
+
+                                foreach ($c in $customers) {
+                                    if ($email -and $c.email -eq $email) {
+                                        $cId = $c.id
+                                        $curLtv = 0.0
+                                        [double]::TryParse([string]($c.lifetime_value), [ref]$curLtv) | Out-Null
+                                        Set-ObjectProperty $c 'lifetime_value' ($curLtv + $amt)
+                                        break
+                                    }
                                 }
-                            }
-                            if ($cId) {
+                                if (-not $cId) {
+                                    $cId = 'CUS-' + (New-SecureId '' 8)
+                                    $newCustObj = @{
+                                        id = $cId
+                                        email = $email
+                                        name = if ($updatedOrder.customer_name) { $updatedOrder.customer_name } else { 'Subscriber' }
+                                        phone = if ($updatedOrder.customer_phone) { $updatedOrder.customer_phone } else { '' }
+                                        password_hash = ''
+                                        created_at = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+                                        tags = @()
+                                        lifetime_value = $amt
+                                        notes = ''
+                                        status = 'active'
+                                    }
+                                    $customers.Insert(0, $newCustObj)
+                                }
                                 Write-JsonFileSafe "customers.json" $customers
                                 
                                 $start = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
                                 $dur = if ($updatedOrder.duration_months) { [int]$updatedOrder.duration_months } else { 12 }
                                 $end = (Get-Date).ToUniversalTime().AddMonths($dur).ToString("yyyy-MM-ddTHH:mm:ssZ")
-                                
-                                # Check if IPTV Panel auto-provisioning is active and line credentials not set
-                                $settings = Read-JsonFileSafe "settings.json" @{}
-                                if ($settings.iptv_panel_enabled -and $settings.iptv_panel_auto_fulfill_orders -and (-not $updatedOrder.xtream_username -or -not $updatedOrder.xtream_password)) {
-                                    $panelLine = New-IptvPanelLine $updatedOrder.plan_id $updatedOrder.devices_count $updatedOrder.customer_email
-                                    $updatedOrder.xtream_username = $panelLine.xtream_username
-                                    $updatedOrder.xtream_password = $panelLine.xtream_password
-                                    $updatedOrder.m3u_url = $panelLine.m3u_url
-                                }
 
                                 $sub = @{
                                     id = 'SUB-' + (Get-Date).ToString('yyyy') + '-' + (New-SecureId '' 5)
@@ -1426,19 +1491,38 @@ try {
                                 $subscriptions.Insert(0, $sub)
                                 Write-JsonFileSafe "subscriptions.json" $subscriptions
                                 
+                                $foundPay = $false
                                 foreach ($p in $payments) {
                                     if ($p.order_id -eq $updatedOrder.id) {
-                                        $p.status = 'CONFIRMED'
-                                        $p.confirmed_at = $start
+                                        Set-ObjectProperty $p 'status' 'CONFIRMED'
+                                        Set-ObjectProperty $p 'confirmed_at' $start
+                                        $foundPay = $true
                                         break
                                     }
+                                }
+                                if (-not $foundPay) {
+                                    $newPay = @{
+                                        id = 'PAY-' + (Get-Date).ToString('yyyyMMdd') + '-' + (New-SecureId '' 5)
+                                        order_id = $updatedOrder.id
+                                        customer_id = $cId
+                                        provider = 'paypal_me'
+                                        provider_transaction_id = ''
+                                        amount = $amt
+                                        currency = if ($updatedOrder.currency) { $updatedOrder.currency } else { 'GBP' }
+                                        status = 'CONFIRMED'
+                                        created_at = $start
+                                        confirmed_at = $start
+                                        failure_reason = ''
+                                        refund_status = 'NONE'
+                                    }
+                                    $payments.Insert(0, $newPay)
                                 }
                                 Write-JsonFileSafe "payments.json" $payments
 
                                 # Dispatch Automated Notifications: Payment Confirmed & Line Credentials
                                 if ($updatedOrder.customer_email) {
                                     $settings = Read-JsonFileSafe "settings.json" @{}
-                                    $srvUrl = if ($settings.m3u_server_template -match 'https?://[^/]+') { $matches[0] } else { "http://line.lunastream.vip:8080" }
+                                    $srvUrl = if ($settings.m3u_server_template -match 'https?://[^/]+') { $matches[0] } else { "http://line.lunaentertainment.online:8080" }
                                     $endFormatted = if ($end) { ([DateTime]::Parse($end)).ToString("yyyy-MM-dd") } else { "12 Months" }
 
                                     Send-EmailNotification "PAYMENT_CONFIRMED" $updatedOrder.customer_email @{
@@ -1459,7 +1543,7 @@ try {
                                         m3u_url = $updatedOrder.m3u_url
                                     } | Out-Null
                                 }
-                            }
+                            } catch {}
                         }
                         
                         Add-AuditLog "UPDATE_ORDER" "Admin" "Updated order $targetId"
@@ -1482,8 +1566,8 @@ try {
                         $targetTrial = $null
                         for ($i = 0; $i -lt $trials.Count; $i++) {
                             if ($trials[$i].id -eq $targetId) {
-                                if ($bodyJson.status) { $trials[$i].status = $bodyJson.status }
-                                if ($bodyJson.test_line_credentials) { $trials[$i].test_line_credentials = $bodyJson.test_line_credentials }
+                                if ($null -ne $bodyJson.status) { Set-ObjectProperty $trials[$i] 'status' ([string]$bodyJson.status) }
+                                if ($null -ne $bodyJson.test_line_credentials) { Set-ObjectProperty $trials[$i] 'test_line_credentials' ([string]$bodyJson.test_line_credentials) }
                                 $targetTrial = $trials[$i]
                                 break
                             }
@@ -1780,9 +1864,9 @@ try {
                         $subs = [System.Collections.ArrayList]@(Read-JsonFileSafe "subscriptions.json" @())
                         for ($i = 0; $i -lt $subs.Count; $i++) {
                             if ($subs[$i].id -eq $subId) {
-                                $subs[$i].xtream_username = $lineRes.xtream_username
-                                $subs[$i].xtream_password = $lineRes.xtream_password
-                                $subs[$i].m3u_url = $lineRes.m3u_url
+                                Set-ObjectProperty $subs[$i] 'xtream_username' $lineRes.xtream_username
+                                Set-ObjectProperty $subs[$i] 'xtream_password' $lineRes.xtream_password
+                                Set-ObjectProperty $subs[$i] 'm3u_url' $lineRes.m3u_url
                                 if ($lineRes.panel_user_id) {
                                     Set-ObjectProperty $subs[$i] "panel_user_id" $lineRes.panel_user_id
                                 }
@@ -1796,9 +1880,9 @@ try {
                         $orders = [System.Collections.ArrayList]@(Read-JsonFileSafe "orders.json" @())
                         for ($i = 0; $i -lt $orders.Count; $i++) {
                             if ($orders[$i].id -eq $orderId) {
-                                $orders[$i].xtream_username = $lineRes.xtream_username
-                                $orders[$i].xtream_password = $lineRes.xtream_password
-                                $orders[$i].m3u_url = $lineRes.m3u_url
+                                Set-ObjectProperty $orders[$i] 'xtream_username' $lineRes.xtream_username
+                                Set-ObjectProperty $orders[$i] 'xtream_password' $lineRes.xtream_password
+                                Set-ObjectProperty $orders[$i] 'm3u_url' $lineRes.m3u_url
                                 break
                             }
                         }
@@ -2203,6 +2287,10 @@ try {
                         server_region = if ($bodyJson.server_region) { $bodyJson.server_region } else { "Global Dynamic CDN" }
                         device_type = if ($bodyJson.device_type) { $bodyJson.device_type } else { "Amazon FireStick 4K" }
                         status = "Pending"
+                        m3u_url = ""
+                        xtream_username = ""
+                        xtream_password = ""
+                        notes = ""
                         created_at = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
                         updated_at = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
                     }
@@ -2586,17 +2674,17 @@ try {
                         $customers.Insert(0, $newCust)
                         Write-JsonFileSafe "customers.json" $customers
                         Add-AuditLog "CREATE_CUSTOMER" "Admin" "Created customer $newId"
-                        Send-JsonResponse $response 201 $newCust
+                        Send-JsonResponse $response 201 @{ success = $true; customer = $newCust; id = $newId }
                     } elseif ($method -eq "PATCH") {
                         $targetId = $bodyJson.id
                         $updated = $null
                         for ($i = 0; $i -lt $customers.Count; $i++) {
                             if ($customers[$i].id -eq $targetId) {
-                                if ($null -ne $bodyJson.name) { $customers[$i].name = $bodyJson.name }
-                                if ($null -ne $bodyJson.phone) { $customers[$i].phone = $bodyJson.phone }
-                                if ($null -ne $bodyJson.tags) { $customers[$i].tags = $bodyJson.tags }
-                                if ($null -ne $bodyJson.notes) { $customers[$i].notes = $bodyJson.notes }
-                                if ($null -ne $bodyJson.status) { $customers[$i].status = $bodyJson.status }
+                                if ($null -ne $bodyJson.name) { Set-ObjectProperty $customers[$i] 'name' ([string]$bodyJson.name) }
+                                if ($null -ne $bodyJson.phone) { Set-ObjectProperty $customers[$i] 'phone' ([string]$bodyJson.phone) }
+                                if ($null -ne $bodyJson.tags) { Set-ObjectProperty $customers[$i] 'tags' $bodyJson.tags }
+                                if ($null -ne $bodyJson.notes) { Set-ObjectProperty $customers[$i] 'notes' ([string]$bodyJson.notes) }
+                                if ($null -ne $bodyJson.status) { Set-ObjectProperty $customers[$i] 'status' ([string]$bodyJson.status) }
                                 $updated = $customers[$i]
                                 break
                             }
@@ -2638,18 +2726,18 @@ try {
                         $subscriptions.Insert(0, $newSub)
                         Write-JsonFileSafe "subscriptions.json" $subscriptions
                         Add-AuditLog "CREATE_SUBSCRIPTION" "Admin" "Created subscription $newId"
-                        Send-JsonResponse $response 201 $newSub
+                        Send-JsonResponse $response 201 @{ success = $true; subscription = $newSub; id = $newId }
                     } elseif ($method -eq "PATCH") {
                         $targetId = $bodyJson.id
                         $updated = $null
                         for ($i = 0; $i -lt $subscriptions.Count; $i++) {
                             if ($subscriptions[$i].id -eq $targetId) {
-                                if ($null -ne $bodyJson.status) { $subscriptions[$i].status = $bodyJson.status }
-                                if ($null -ne $bodyJson.end_date) { $subscriptions[$i].end_date = $bodyJson.end_date }
-                                if ($null -ne $bodyJson.xtream_username) { $subscriptions[$i].xtream_username = $bodyJson.xtream_username }
-                                if ($null -ne $bodyJson.xtream_password) { $subscriptions[$i].xtream_password = $bodyJson.xtream_password }
-                                if ($null -ne $bodyJson.m3u_url) { $subscriptions[$i].m3u_url = $bodyJson.m3u_url }
-                                $subscriptions[$i].updated_at = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+                                if ($null -ne $bodyJson.status) { Set-ObjectProperty $subscriptions[$i] 'status' ([string]$bodyJson.status) }
+                                if ($null -ne $bodyJson.end_date) { Set-ObjectProperty $subscriptions[$i] 'end_date' ([string]$bodyJson.end_date) }
+                                if ($null -ne $bodyJson.xtream_username) { Set-ObjectProperty $subscriptions[$i] 'xtream_username' ([string]$bodyJson.xtream_username) }
+                                if ($null -ne $bodyJson.xtream_password) { Set-ObjectProperty $subscriptions[$i] 'xtream_password' ([string]$bodyJson.xtream_password) }
+                                if ($null -ne $bodyJson.m3u_url) { Set-ObjectProperty $subscriptions[$i] 'm3u_url' ([string]$bodyJson.m3u_url) }
+                                Set-ObjectProperty $subscriptions[$i] 'updated_at' ((Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ"))
                                 $updated = $subscriptions[$i]
                                 break
                             }
@@ -2689,17 +2777,17 @@ try {
                         $coupons.Insert(0, $newCoup)
                         Write-JsonFileSafe "coupons.json" $coupons
                         Add-AuditLog "CREATE_COUPON" "Admin" "Created coupon $newId"
-                        Send-JsonResponse $response 201 $newCoup
+                        Send-JsonResponse $response 201 @{ success = $true; coupon = $newCoup; id = $newId }
                     } elseif ($method -eq "PATCH") {
                         $targetId = $bodyJson.id
                         $updated = $null
                         for ($i = 0; $i -lt $coupons.Count; $i++) {
                             if ($coupons[$i].id -eq $targetId) {
-                                if ($null -ne $bodyJson.active) { $coupons[$i].active = [bool]$bodyJson.active }
-                                if ($null -ne $bodyJson.discount_value) { $coupons[$i].discount_value = [double]$bodyJson.discount_value }
-                                if ($null -ne $bodyJson.valid_until) { $coupons[$i].valid_until = $bodyJson.valid_until }
-                                if ($null -ne $bodyJson.usage_limit) { $coupons[$i].usage_limit = [int]$bodyJson.usage_limit }
-                                if ($null -ne $bodyJson.code) { $coupons[$i].code = $bodyJson.code.ToString().Trim().ToUpper() }
+                                if ($null -ne $bodyJson.active) { Set-ObjectProperty $coupons[$i] 'active' ([bool]$bodyJson.active) }
+                                if ($null -ne $bodyJson.discount_value) { Set-ObjectProperty $coupons[$i] 'discount_value' ([double]$bodyJson.discount_value) }
+                                if ($null -ne $bodyJson.valid_until) { Set-ObjectProperty $coupons[$i] 'valid_until' ([string]$bodyJson.valid_until) }
+                                if ($null -ne $bodyJson.usage_limit) { Set-ObjectProperty $coupons[$i] 'usage_limit' ([int]$bodyJson.usage_limit) }
+                                if ($null -ne $bodyJson.code) { Set-ObjectProperty $coupons[$i] 'code' ($bodyJson.code.ToString().Trim().ToUpper()) }
                                 $updated = $coupons[$i]
                                 break
                             }
@@ -3074,9 +3162,9 @@ try {
                             text = [string]$replyText
                             timestamp = $nowStr
                         })
-                        $target.messages = $msgList
-                        $target.status = "WAITING_ON_ADMIN"
-                        $target.updated_at = $nowStr
+                        Set-ObjectProperty $target 'messages' $msgList
+                        Set-ObjectProperty $target 'status' "WAITING_ON_ADMIN"
+                        Set-ObjectProperty $target 'updated_at' $nowStr
 
                         Write-JsonFileSafe "support_tickets.json" $tickets
                         Send-JsonResponse $response 200 @{ success = $true }
@@ -3104,9 +3192,9 @@ try {
                     $target = $tickets | Where-Object { $_.id -eq $ticketId } | Select-Object -First 1
 
                     if ($target) {
-                        if ($null -ne $bodyJson.status) { $target.status = [string]$bodyJson.status }
-                        if ($null -ne $bodyJson.priority) { $target.priority = [string]$bodyJson.priority }
-                        $target.updated_at = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+                        if ($null -ne $bodyJson.status) { Set-ObjectProperty $target 'status' ([string]$bodyJson.status) }
+                        if ($null -ne $bodyJson.priority) { Set-ObjectProperty $target 'priority' ([string]$bodyJson.priority) }
+                        Set-ObjectProperty $target 'updated_at' ((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))
 
                         Write-JsonFileSafe "support_tickets.json" $tickets
                         Add-AuditLog "TICKET_UPDATED" "Admin" "Ticket $ticketId updated to $($target.status)"
@@ -3137,9 +3225,9 @@ try {
                             text = [string]$replyText
                             timestamp = $nowStr
                         })
-                        $target.messages = $msgList
-                        $target.status = $newStatus
-                        $target.updated_at = $nowStr
+                        Set-ObjectProperty $target 'messages' $msgList
+                        Set-ObjectProperty $target 'status' $newStatus
+                        Set-ObjectProperty $target 'updated_at' $nowStr
 
                         Write-JsonFileSafe "support_tickets.json" $tickets
                         Add-AuditLog "TICKET_REPLIED" "Admin" "Replied to ticket $ticketId"
@@ -3169,8 +3257,8 @@ try {
                         Send-JsonResponse $response 404 @{ success = $false; message = "Template not found" }
                         continue
                     }
-                    if ($null -ne $bodyJson.subject) { $templates.$templateKey.subject = [string]$bodyJson.subject }
-                    if ($null -ne $bodyJson.body_text) { $templates.$templateKey.body_text = [string]$bodyJson.body_text }
+                    if ($null -ne $bodyJson.subject) { Set-ObjectProperty $templates.$templateKey 'subject' ([string]$bodyJson.subject) }
+                    if ($null -ne $bodyJson.body_text) { Set-ObjectProperty $templates.$templateKey 'body_text' ([string]$bodyJson.body_text) }
                     Write-JsonFileSafe "email_templates.json" $templates
                     Add-AuditLog "EMAIL_TEMPLATE_UPDATED" "Admin" "Updated template $templateKey"
                     Send-JsonResponse $response 200 @{ success = $true; template = $templates.$templateKey }
