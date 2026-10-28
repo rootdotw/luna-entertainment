@@ -74,10 +74,55 @@ const PRICING_DATA = {
 let currentCurrency = 'GBP';
 let currentDevices = 1;
 
+function detectVisitorCurrency() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramCurr = (urlParams.get('curr') || urlParams.get('currency') || '').toUpperCase();
+    if (paramCurr && PRICING_DATA.currencies[paramCurr]) {
+      return paramCurr;
+    }
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    if (tz.startsWith('America/')) {
+      return 'USD';
+    }
+    if (tz.startsWith('Europe/')) {
+      const ukZones = ['Europe/London', 'Europe/Belfast', 'Europe/Guernsey', 'Europe/Isle_of_Man', 'Europe/Jersey'];
+      return ukZones.includes(tz) ? 'GBP' : 'EUR';
+    }
+  } catch (e) {}
+  return 'GBP';
+}
+
+window.jumpToPlanCard = function(planId) {
+  const card = document.getElementById(`plan-card-${planId}`);
+  if (card) {
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.classList.add('ring-4', 'ring-blue-400/60');
+    setTimeout(() => {
+      card.classList.remove('ring-4', 'ring-blue-400/60');
+    }, 1800);
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+  currentCurrency = detectVisitorCurrency();
   initPricingControls();
   renderAllPricing();
   fetchDynamicPricing();
+
+  // Auto-hide mobile floating scroll helper once user scrolls into pricing cards
+  const scrollWrap = document.getElementById('mobile-scroll-plans-wrap');
+  const gridEl = document.getElementById('pricing-cards-grid');
+  if (scrollWrap && gridEl) {
+    window.addEventListener('scroll', () => {
+      const rect = gridEl.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.45) {
+        scrollWrap.classList.add('opacity-0', 'pointer-events-none');
+      } else {
+        scrollWrap.classList.remove('opacity-0', 'pointer-events-none');
+      }
+    }, { passive: true });
+  }
 });
 
 async function fetchDynamicPricing() {
@@ -120,6 +165,15 @@ function initPricingControls() {
   // Currency buttons
   const currencyBtns = document.querySelectorAll('.currency-btn');
   currencyBtns.forEach(btn => {
+    const btnCurr = btn.getAttribute('data-currency') || 'GBP';
+    if (btnCurr === currentCurrency) {
+      btn.classList.remove('bg-[#101522]', 'border-[#263247]', 'text-slate-300', 'bg-slate-800');
+      btn.classList.add('active', 'bg-blue-600', 'text-white', 'font-bold', 'shadow-sm');
+    } else {
+      btn.classList.remove('active', 'bg-blue-600', 'text-white', 'shadow-sm', 'bg-cyan-500', 'text-black', 'shadow-cyan-500/50');
+      btn.classList.add('bg-[#101522]', 'border', 'border-[#263247]', 'text-slate-300');
+    }
+
     btn.addEventListener('click', () => {
       currencyBtns.forEach(b => {
         b.classList.remove('active', 'bg-blue-600', 'text-white', 'shadow-sm', 'bg-cyan-500', 'text-black', 'shadow-cyan-500/50');
@@ -237,6 +291,16 @@ function renderAllPricing() {
     if (perMonthEl) {
       perMonthEl.textContent = `${calc.perMonthFormatted}/mo`;
     }
+
+    // Update top quick-jump summary bar prices & per-month breakdown
+    const quickPriceEls = document.querySelectorAll(`[data-quick-price="${planId}"]`);
+    quickPriceEls.forEach(el => {
+      el.textContent = calc.formatted;
+    });
+    const quickMoEls = document.querySelectorAll(`[data-quick-mo="${planId}"]`);
+    quickMoEls.forEach(el => {
+      el.textContent = `${calc.perMonthFormatted}/mo`;
+    });
 
     // Update extra bonus months container
     const extraEl = document.querySelector(`[data-plan-extra="${planId}"]`);

@@ -1,279 +1,427 @@
 /**
- * Luna Stream IPTV - Live Sports & PPV Match Countdown Controller
- * Real-time Dynamic & Rolling Sporting Events
- * Automatically rolls fixtures daily and synchronizes with /api/sports/fixtures
+ * Luna Stream IPTV - Real-Time Live Sports & PPV Match Center
+ * Pulls live & upcoming fixtures automatically from official ESPN public scoreboard APIs
+ * (Premier League, UEFA Champions League, LaLiga, Serie A, Bundesliga, UFC, F1, NBA, ATP Tennis)
+ * with intelligent rolling fallback so every sport category is always fresh and never outdated.
  */
 
 let SPORTS_EVENTS = [];
 let activeSportsCategory = 'all';
 let sportsTimerInterval = null;
+let sportsAutoRefreshInterval = null;
+
+const ESPN_ENDPOINTS = [
+  {
+    url: 'https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard',
+    category: 'football',
+    league: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League',
+    league_color: 'from-purple-600 to-pink-600',
+    channels: ['Sky Sports Premier League 4K', 'TNT Sports 1 4K', 'USA Network UHD'],
+    quality: '4K UHD • 60 FPS • HDR'
+  },
+  {
+    url: 'https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard',
+    category: 'football',
+    league: '🏆 UEFA Champions League',
+    league_color: 'from-blue-600 to-indigo-600',
+    channels: ['TNT Sports Ultimate 4K', 'Paramount+ UHD', 'Canal+ Foot 4K'],
+    quality: '4K UHD • 60 FPS • Dolby Atmos'
+  },
+  {
+    url: 'https://site.api.espn.com/apis/site/v2/sports/soccer/esp.1/scoreboard',
+    category: 'football',
+    league: '🇪🇸 LaLiga EA Sports',
+    league_color: 'from-red-600 to-amber-600',
+    channels: ['Premier Sports 1 HD', 'Movistar LaLiga 4K', 'ESPN+ UHD'],
+    quality: '4K UHD • 60 FPS'
+  },
+  {
+    url: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ita.1/scoreboard',
+    category: 'football',
+    league: '🇮🇹 Serie A Enilive',
+    league_color: 'from-blue-700 to-cyan-600',
+    channels: ['TNT Sports 2 4K', 'DAZN 1 4K', 'Paramount+ UHD'],
+    quality: '4K UHD • 60 FPS'
+  },
+  {
+    url: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard',
+    category: 'football',
+    league: '🇩🇪 Bundesliga',
+    league_color: 'from-red-700 to-rose-600',
+    channels: ['Sky Sports Football 4K', 'DAZN Bundesliga 4K', 'ESPN+ UHD'],
+    quality: '4K UHD • 60 FPS'
+  },
+  {
+    url: 'https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard',
+    category: 'ufc',
+    league: '🥊 UFC Championship & Fight Night',
+    league_color: 'from-red-600 to-amber-600',
+    channels: ['TNT Sports Box Office 4K', 'ESPN+ PPV UHD', 'Sony LIV 4K'],
+    quality: '4K UHD • PPV Included • Zero Delay'
+  },
+  {
+    url: 'https://site.api.espn.com/apis/site/v2/sports/racing/f1/scoreboard',
+    category: 'f1',
+    league: '🏎️ Formula 1 World Championship',
+    league_color: 'from-red-600 to-red-800',
+    channels: ['Sky Sports F1 4K UHD', 'F1 TV Pro 60FPS', 'Canal+ F1 4K'],
+    quality: '4K UHD • 60 FPS Direct Supernode'
+  },
+  {
+    url: 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard',
+    category: 'basketball',
+    league: '🏀 NBA Basketball',
+    league_color: 'from-orange-600 to-amber-500',
+    channels: ['TNT Sports NBA 4K', 'ESPN UHD', 'NBA League Pass 60FPS'],
+    quality: '4K UHD • 60 FPS'
+  },
+  {
+    url: 'https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard',
+    category: 'tennis',
+    league: '🎾 ATP Tour Tennis',
+    league_color: 'from-emerald-600 to-teal-700',
+    channels: ['Sky Sports Tennis 4K', 'Tennis TV UHD', 'Eurosport 4K'],
+    quality: 'Native 4K UHD • 60 FPS'
+  }
+];
 
 document.addEventListener('DOMContentLoaded', () => {
   initSportsFilters();
   loadSportsFixtures();
 
-  // Periodically check countdowns and live transitions
+  // Real-time 1-second countdown ticker
   sportsTimerInterval = setInterval(updateAllCountdowns, 1000);
+
+  // Auto-refresh live scores & new fixtures every 60 seconds
+  sportsAutoRefreshInterval = setInterval(() => {
+    loadSportsFixtures(true);
+  }, 60000);
 });
 
+window.refreshSportsManual = async function() {
+  const btn = document.getElementById('btn-refresh-sports');
+  if (btn) {
+    btn.textContent = '⏳ Syncing Live Feed...';
+    btn.disabled = true;
+  }
+  await loadSportsFixtures(false);
+  if (btn) {
+    btn.innerHTML = '<span>✅ Schedule Updated!</span>';
+    btn.disabled = false;
+    setTimeout(() => {
+      btn.innerHTML = '<span>🔄 Refresh Live Schedule</span>';
+    }, 2000);
+  }
+};
+
 /* -------------------------------------------------------------
-   1. Dynamic Fixtures Loader (API with Client-Side Rolling Fallback)
+   1. Live ESPN Global Sports Fetcher + Rolling Calendar Engine
    ------------------------------------------------------------- */
-async function loadSportsFixtures() {
-  try {
-    const res = await fetch('/api/sports/fixtures', { cache: 'no-cache' });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && Array.isArray(data.fixtures) && data.fixtures.length > 0) {
-        SPORTS_EVENTS = data.fixtures;
-        renderSportsGrid();
-        updateCategoryCounts();
-        return;
-      }
-    }
-  } catch (err) {
-    console.warn('Backend sports API unavailable, using dynamic client-side calendar engine:', err);
+async function loadSportsFixtures(isSilent = false) {
+  const statusEl = document.getElementById('sports-sync-status');
+  const timeEl = document.getElementById('sports-last-synced');
+
+  // Render rolling fallback immediately on first load so grid is never blank
+  if (SPORTS_EVENTS.length === 0) {
+    SPORTS_EVENTS = generateDynamicFixturesClientSide();
+    renderSportsGrid();
+    updateCategoryCounts();
   }
 
-  // Fallback: Dynamic client-side engine aware of current real-time date
+  try {
+    const liveEvents = await fetchRealLiveSportsFromESPN();
+    if (liveEvents && liveEvents.length > 0) {
+      // Merge live ESPN events with rolling fallback for any sport category that has 0 active ESPN events today
+      const fallbackEvents = generateDynamicFixturesClientSide();
+      const categories = ['football', 'ufc', 'f1', 'basketball', 'tennis'];
+      const combined = [...liveEvents];
+
+      categories.forEach(cat => {
+        const hasCat = combined.some(e => e.category === cat);
+        if (!hasCat) {
+          const fbForCat = fallbackEvents.filter(e => e.category === cat);
+          combined.push(...fbForCat);
+        }
+      });
+
+      // Sort: LIVE matches first, then upcoming matches chronologically
+      combined.sort((a, b) => {
+        if (a.is_live && !b.is_live) return -1;
+        if (!a.is_live && b.is_live) return 1;
+        return a.start_time - b.start_time;
+      });
+
+      SPORTS_EVENTS = combined;
+      renderSportsGrid();
+      updateCategoryCounts();
+
+      if (statusEl) statusEl.textContent = 'Live ESPN & Global Broadcast Feed Synced';
+      if (timeEl) {
+        const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        timeEl.textContent = `Updated at ${nowStr}`;
+      }
+      return;
+    }
+  } catch (err) {
+    // Fallback to rolling calendar engine
+  }
+
   SPORTS_EVENTS = generateDynamicFixturesClientSide();
   renderSportsGrid();
   updateCategoryCounts();
+  if (timeEl) {
+    const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    timeEl.textContent = `Updated at ${nowStr}`;
+  }
+}
+
+async function fetchRealLiveSportsFromESPN() {
+  const now = Date.now();
+  const parsedFixtures = [];
+
+  const results = await Promise.allSettled(
+    ESPN_ENDPOINTS.map(cfg =>
+      fetch(cfg.url, { cache: 'no-store' })
+        .then(r => (r.ok ? r.json() : null))
+        .then(data => ({ cfg, data }))
+    )
+  );
+
+  results.forEach(res => {
+    if (res.status !== 'fulfilled' || !res.value || !res.value.data) return;
+    const { cfg, data } = res.value;
+    const events = Array.isArray(data.events) ? data.events : [];
+
+    if (cfg.category === 'football' || cfg.category === 'basketball') {
+      let countForLeague = 0;
+      events.forEach(ev => {
+        if (countForLeague >= 4) return;
+        const comp = ev.competitions && ev.competitions[0];
+        if (!comp || !comp.competitors || comp.competitors.length < 2) return;
+
+        const state = (ev.status && ev.status.type && ev.status.type.state) || 'pre';
+        const startMs = new Date(ev.date).getTime();
+        // Skip finished matches that started more than 3 hours ago
+        if (state === 'post') return;
+        if (startMs < now - 3 * 60 * 60 * 1000 && state !== 'in') return;
+
+        const home = comp.competitors.find(c => c.homeAway === 'home') || comp.competitors[0];
+        const away = comp.competitors.find(c => c.homeAway === 'away') || comp.competitors[1];
+
+        const teamA = (home.team && (home.team.shortDisplayName || home.team.displayName)) || 'Home Team';
+        const teamB = (away.team && (away.team.shortDisplayName || away.team.displayName)) || 'Away Team';
+        const logoA = (home.team && home.team.logo) || '';
+        const logoB = (away.team && away.team.logo) || '';
+        const isLive = state === 'in';
+        const detail = (ev.status && ev.status.type && ev.status.type.shortDetail) || 'Live Now';
+        const scoreText = isLive ? `${home.score || 0} - ${away.score || 0}` : '';
+
+        const venueName = comp.venue
+          ? [comp.venue.fullName, comp.venue.address && comp.venue.address.city].filter(Boolean).join(', ')
+          : '';
+
+        parsedFixtures.push({
+          id: `espn-${ev.id}`,
+          category: cfg.category,
+          league: `${cfg.league} • ${isLive ? 'Matchday Live' : 'Official Fixture'}`,
+          league_color: cfg.league_color,
+          is_live: isLive,
+          live_status: isLive ? `${detail} (${scoreText}) • 4K Direct Feed` : '',
+          live_score: scoreText,
+          team_a: teamA,
+          team_a_icon: cfg.category === 'basketball' ? '🏀' : '⚽',
+          team_a_logo: logoA,
+          team_b: teamB,
+          team_b_icon: cfg.category === 'basketball' ? '🏀' : '⚽',
+          team_b_logo: logoB,
+          venue: venueName || 'Official Broadcast Arena',
+          start_time: startMs,
+          end_time: startMs + (135 * 60 * 1000),
+          channels: cfg.channels,
+          quality: isLive ? '4K UHD • 60 FPS • LIVE NOW' : cfg.quality
+        });
+        countForLeague++;
+      });
+    } else if (cfg.category === 'ufc') {
+      events.slice(0, 2).forEach(ev => {
+        const comps = Array.isArray(ev.competitions) ? ev.competitions : [];
+        if (comps.length === 0) return;
+        const eventState = (ev.status && ev.status.type && ev.status.type.state) || 'pre';
+        if (eventState === 'post') return;
+
+        // Take Main Event (last competition) and Co-Main Event (second to last)
+        const mainBouts = comps.slice(-2).reverse();
+        mainBouts.forEach((bout, idx) => {
+          if (!bout.competitors || bout.competitors.length < 2) return;
+          const f1 = bout.competitors[0];
+          const f2 = bout.competitors[1];
+          const name1 = (f1.athlete && f1.athlete.displayName) || 'Fighter 1';
+          const name2 = (f2.athlete && f2.athlete.displayName) || 'Fighter 2';
+          const flag1 = (f1.athlete && f1.athlete.flag && f1.athlete.flag.href) || '';
+          const flag2 = (f2.athlete && f2.athlete.flag && f2.athlete.flag.href) || '';
+          const boutState = (bout.status && bout.status.type && bout.status.type.state) || eventState;
+          if (boutState === 'post') return;
+
+          const startMs = new Date(bout.date || ev.date).getTime();
+          const isLive = boutState === 'in';
+          const venueName = bout.venue
+            ? [bout.venue.fullName, bout.venue.address && bout.venue.address.city].filter(Boolean).join(', ')
+            : 'UFC Apex / PPV Arena';
+
+          parsedFixtures.push({
+            id: `espn-ufc-${bout.id || ev.id}-${idx}`,
+            category: 'ufc',
+            league: `🥊 ${ev.name || 'UFC Fight Night'} (${idx === 0 ? 'Main Event' : 'Co-Main Event'})`,
+            league_color: cfg.league_color,
+            is_live: isLive,
+            live_status: isLive ? 'Live Octagon Feed • 4K PPV' : '',
+            team_a: name1,
+            team_a_icon: '🥊',
+            team_a_logo: flag1,
+            team_b: name2,
+            team_b_icon: '🥊',
+            team_b_logo: flag2,
+            venue: venueName,
+            start_time: startMs,
+            end_time: startMs + (180 * 60 * 1000),
+            channels: cfg.channels,
+            quality: cfg.quality
+          });
+        });
+      });
+    } else if (cfg.category === 'f1') {
+      events.slice(0, 2).forEach(ev => {
+        const comps = Array.isArray(ev.competitions) ? ev.competitions : [];
+        // Find next upcoming or live session (Qualifying, Sprint, or Grand Prix Race)
+        const activeSessions = comps.filter(c => {
+          const st = (c.status && c.status.type && c.status.type.state) || 'pre';
+          return st === 'in' || st === 'pre';
+        });
+        if (activeSessions.length === 0) return;
+
+        // Pick the next immediate session and the final Race session
+        const nextSess = activeSessions[0];
+        const raceSess = activeSessions[activeSessions.length - 1];
+        const sessionsToShow = nextSess.id === raceSess.id ? [raceSess] : [nextSess, raceSess];
+
+        sessionsToShow.forEach((sess, idx) => {
+          const st = (sess.status && sess.status.type && sess.status.type.state) || 'pre';
+          const isLive = st === 'in';
+          const startMs = new Date(sess.date || ev.date).getTime();
+          const sessTitle = idx === sessionsToShow.length - 1 ? 'Grand Prix Main Race' : 'Qualifying / Sprint Session';
+          const circuitName = (sess.circuit && sess.circuit.fullName) || ev.shortName || 'Grand Prix Circuit';
+
+          parsedFixtures.push({
+            id: `espn-f1-${sess.id || ev.id}-${idx}`,
+            category: 'f1',
+            league: `🏎️ ${ev.name || 'Formula 1 Grand Prix'}`,
+            league_color: cfg.league_color,
+            is_live: isLive,
+            live_status: isLive ? `${sessTitle} • Live Track Feed` : '',
+            team_a: ev.shortName || 'F1 Grand Prix',
+            team_a_icon: '🏎️',
+            team_b: sessTitle,
+            team_b_icon: '🏁',
+            venue: circuitName,
+            start_time: startMs,
+            end_time: startMs + (150 * 60 * 1000),
+            channels: cfg.channels,
+            quality: cfg.quality
+          });
+        });
+      });
+    } else if (cfg.category === 'tennis') {
+      let tennisCount = 0;
+      events.forEach(ev => {
+        if (tennisCount >= 2) return;
+        const groupings = Array.isArray(ev.groupings) ? ev.groupings : [];
+        groupings.forEach(grp => {
+          if (tennisCount >= 2) return;
+          const comps = Array.isArray(grp.competitions) ? grp.competitions : [];
+          comps.forEach(comp => {
+            if (tennisCount >= 2) return;
+            const st = (comp.status && comp.status.type && comp.status.type.state) || 'pre';
+            if (st === 'post') return;
+            if (!comp.competitors || comp.competitors.length < 2) return;
+            const p1 = comp.competitors[0];
+            const p2 = comp.competitors[1];
+            const name1 = (p1.athlete && p1.athlete.displayName) || 'TBD';
+            const name2 = (p2.athlete && p2.athlete.displayName) || 'TBD';
+            if (name1 === 'TBD' || name2 === 'TBD') return;
+
+            const flag1 = (p1.athlete && p1.athlete.flag && p1.athlete.flag.href) || '';
+            const flag2 = (p2.athlete && p2.athlete.flag && p2.athlete.flag.href) || '';
+            const startMs = new Date(comp.date || ev.date).getTime();
+            const isLive = st === 'in';
+
+            parsedFixtures.push({
+              id: `espn-atp-${comp.id}`,
+              category: 'tennis',
+              league: `🎾 ${ev.name || 'ATP Tour'}`,
+              league_color: cfg.league_color,
+              is_live: isLive,
+              live_status: isLive ? 'Center Court Live • 4K UHD' : '',
+              team_a: name1,
+              team_a_icon: '🎾',
+              team_a_logo: flag1,
+              team_b: name2,
+              team_b_icon: '🎾',
+              team_b_logo: flag2,
+              venue: (comp.venue && comp.venue.fullName) || ev.name || 'Center Court',
+              start_time: startMs,
+              end_time: startMs + (150 * 60 * 1000),
+              channels: cfg.channels,
+              quality: cfg.quality
+            });
+            tennisCount++;
+          });
+        });
+      });
+    }
+  });
+
+  return parsedFixtures;
 }
 
 /**
- * Generates rolling same-day and upcoming fixtures based on real calendar clock.
- * Guarantees sports.html is NEVER stuck at static dates even offline.
+ * Rolling Calendar Engine (Fallback for any category without an active ESPN event today)
+ * Always calculates future timestamps relative to the visitor's current clock so no event is ever stale.
  */
 function generateDynamicFixturesClientSide() {
   const now = new Date();
-  const dayOfWeek = now.getDay(); // 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu, 5 = Fri, 6 = Sat
-  const currentHour = now.getHours();
+  const nowMs = now.getTime();
+  const dayOfWeek = now.getDay();
 
-  function getEpochMs(daysAhead, hour, minute) {
-    const d = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
-    d.setHours(hour, minute, 0, 0);
+  function getFutureSlotMs(hoursFromNow, roundedMinute = 0) {
+    const d = new Date(nowMs + hoursFromNow * 60 * 60 * 1000);
+    d.setMinutes(roundedMinute, 0, 0);
+    if (d.getTime() <= nowMs) {
+      d.setHours(d.getHours() + 2);
+    }
     return d.getTime();
   }
 
-  // Calculate upcoming Saturday and Sunday
-  let daysUntilSat = (6 - dayOfWeek + 7) % 7;
-  if (daysUntilSat === 0 && currentHour >= 23) daysUntilSat = 7;
-
-  let daysUntilSun = (0 - dayOfWeek + 7) % 7;
-  if (daysUntilSun === 0 && currentHour >= 20) daysUntilSun = 7;
-
-  const fixtures = [];
-
-  // 1. Live Match Today
-  const liveStart = now.getTime() - (38 * 60 * 1000);
-  const liveEnd = now.getTime() + (70 * 60 * 1000);
-
-  if (dayOfWeek === 1) { // Monday
-    fixtures.push({
-      id: 'evt-live-' + dayOfWeek,
+  return [
+    {
+      id: 'roll-football-1',
       category: 'football',
-      league: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League • Matchday Live',
+      league: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League • Matchday Showcase',
       league_color: 'from-purple-600 to-pink-600',
-      is_live: true,
-      live_status: "1st Half (38') • 4K Direct Feed",
-      team_a: 'Newcastle United',
-      team_a_icon: '⚪',
-      team_b: 'West Ham United',
-      team_b_icon: '⚒️',
-      venue: "St. James' Park, Newcastle",
-      start_time: liveStart,
-      end_time: liveEnd,
-      channels: ['Sky Sports Premier League 4K', 'USA Network UHD', 'Canal+ Foot 4K'],
-      quality: '4K UHD • 60 FPS • LIVE NOW'
-    });
-  } else if (dayOfWeek === 2 || dayOfWeek === 3) { // Tuesday / Wednesday UCL
-    fixtures.push({
-      id: 'evt-live-' + dayOfWeek,
-      category: 'football',
-      league: '🏆 UEFA Champions League • Matchday Live',
-      league_color: 'from-blue-600 to-indigo-600',
-      is_live: true,
-      live_status: "1st Half (38') • 4K Direct Feed",
-      team_a: 'Real Madrid',
-      team_a_icon: '⚪',
-      team_b: 'Bayern Munich',
-      team_b_icon: '🔴',
-      venue: 'Santiago Bernabéu, Madrid',
-      start_time: liveStart,
-      end_time: liveEnd,
-      channels: ['TNT Sports Ultimate 4K', 'Canal+ UHD', 'Paramount+ 4K'],
-      quality: '4K UHD • 60 FPS • LIVE NOW'
-    });
-  } else if (dayOfWeek === 4) { // Thursday UEL
-    fixtures.push({
-      id: 'evt-live-' + dayOfWeek,
-      category: 'football',
-      league: '🏆 UEFA Europa League • Matchday Live',
-      league_color: 'from-orange-600 to-amber-600',
-      is_live: true,
-      live_status: "1st Half (35') • 4K Feed",
-      team_a: 'Manchester United',
-      team_a_icon: '🔴',
-      team_b: 'AS Roma',
-      team_b_icon: '🐺',
-      venue: 'Old Trafford, Manchester',
-      start_time: liveStart,
-      end_time: liveEnd,
-      channels: ['TNT Sports 1 4K', 'DAZN 1 4K', 'Movistar Liga 4K'],
-      quality: '4K UHD • 60 FPS • LIVE NOW'
-    });
-  } else if (dayOfWeek === 5) { // Friday
-    fixtures.push({
-      id: 'evt-live-' + dayOfWeek,
-      category: 'football',
-      league: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League • Friday Night Football',
-      league_color: 'from-purple-600 to-pink-600',
-      is_live: true,
-      live_status: "1st Half (34') • 4K Feed",
-      team_a: 'Aston Villa',
-      team_a_icon: '🦁',
-      team_b: 'Brighton & Hove Albion',
-      team_b_icon: '🔵',
-      venue: 'Villa Park, Birmingham',
-      start_time: liveStart,
-      end_time: liveEnd,
-      channels: ['Sky Sports Main Event 4K', 'Peacock UHD', 'beIN Sports 1 4K'],
-      quality: '4K UHD • 60 FPS • LIVE NOW'
-    });
-  } else if (dayOfWeek === 6) { // Saturday
-    fixtures.push({
-      id: 'evt-live-' + dayOfWeek,
-      category: 'football',
-      league: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League • Super Saturday 4K',
-      league_color: 'from-purple-600 to-pink-600',
-      is_live: true,
-      live_status: "1st Half (38') • 4K Direct Feed",
-      team_a: 'Manchester City',
-      team_a_icon: '🔵',
-      team_b: 'Arsenal FC',
-      team_b_icon: '🔴',
-      venue: 'Etihad Stadium, Manchester',
-      start_time: liveStart,
-      end_time: liveEnd,
-      channels: ['Sky Sports Premier League 4K', 'TNT Sports 1 4K', 'Peacock 4K'],
-      quality: '4K UHD • 60 FPS • LIVE NOW'
-    });
-  } else { // Sunday (dayOfWeek === 0)
-    fixtures.push({
-      id: 'evt-live-' + dayOfWeek,
-      category: 'football',
-      league: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League • Super Sunday Derby',
-      league_color: 'from-purple-600 to-pink-600',
-      is_live: true,
-      live_status: "1st Half (35') • 4K Feed",
-      team_a: 'Liverpool FC',
-      team_a_icon: '🔴',
-      team_b: 'Manchester United',
-      team_b_icon: '🔴',
-      venue: 'Anfield, Liverpool',
-      start_time: liveStart,
-      end_time: liveEnd,
-      channels: ['Sky Sports Premier League 4K', 'USA Network UHD', 'DAZN 4K'],
-      quality: '4K UHD • 60 FPS • LIVE NOW'
-    });
-  }
-
-  // 2. Later Today / Tonight Match
-  const tonightHour = currentHour < 20 ? 20 : 21;
-  const tonightStart = getEpochMs(0, tonightHour, 0);
-
-  if (dayOfWeek === 1) {
-    fixtures.push({
-      id: 'evt-today-tonight',
-      category: 'football',
-      league: '🇮🇹 Serie A • Monday Night Primetime',
-      league_color: 'from-blue-700 to-cyan-600',
-      is_live: false,
-      team_a: 'Lazio',
-      team_a_icon: '🦅',
-      team_b: 'Fiorentina',
-      team_b_icon: '💜',
-      venue: 'Stadio Olimpico, Rome',
-      start_time: tonightStart,
-      end_time: tonightStart + (110 * 60 * 1000),
-      channels: ['TNT Sports 2 4K', 'DAZN 2 4K', 'Paramount+ UHD'],
-      quality: '4K UHD • 60 FPS • Dolby 5.1'
-    });
-  } else if (dayOfWeek === 2 || dayOfWeek === 3) {
-    fixtures.push({
-      id: 'evt-today-tonight',
-      category: 'football',
-      league: '🏆 UEFA Champions League • Matchday Primetime',
-      league_color: 'from-blue-600 to-indigo-600',
       is_live: false,
       team_a: 'Arsenal FC',
       team_a_icon: '🔴',
-      team_b: 'Juventus',
-      team_b_icon: '⚪',
+      team_b: 'Liverpool FC',
+      team_b_icon: '🔴',
       venue: 'Emirates Stadium, London',
-      start_time: tonightStart,
-      end_time: tonightStart + (110 * 60 * 1000),
-      channels: ['TNT Sports 1 4K', 'Canal+ Foot 4K', 'Movistar Liga 4K'],
-      quality: '4K UHD • 60 FPS • Dolby Atmos'
-    });
-  } else if (dayOfWeek === 4) {
-    fixtures.push({
-      id: 'evt-today-tonight',
+      start_time: getFutureSlotMs(3, 30),
+      end_time: getFutureSlotMs(5, 30),
+      channels: ['Sky Sports Main Event 4K', 'TNT Sports Ultimate 4K', 'Peacock UHD'],
+      quality: '4K UHD • 60 FPS • HDR'
+    },
+    {
+      id: 'roll-football-2',
       category: 'football',
-      league: '🏆 UEFA Europa League • Primetime',
-      league_color: 'from-orange-600 to-amber-600',
-      is_live: false,
-      team_a: 'Tottenham Hotspur',
-      team_a_icon: '⚪',
-      team_b: 'Galatasaray',
-      team_b_icon: '🦁',
-      venue: 'Tottenham Hotspur Stadium, London',
-      start_time: tonightStart,
-      end_time: tonightStart + (110 * 60 * 1000),
-      channels: ['TNT Sports 2 4K', 'Sony LIV 4K', 'beIN Sports 2 4K'],
-      quality: '4K UHD • 60 FPS • Ultra HDR'
-    });
-  } else if (dayOfWeek === 5) {
-    fixtures.push({
-      id: 'evt-today-tonight',
-      category: 'football',
-      league: '🇪🇸 La Liga EA Sports • Friday Showcase',
-      league_color: 'from-red-600 to-yellow-600',
-      is_live: false,
-      team_a: 'Sevilla FC',
-      team_a_icon: '⚪',
-      team_b: 'Real Sociedad',
-      team_b_icon: '🔵',
-      venue: 'Ramón Sánchez-Pizjuán, Seville',
-      start_time: tonightStart,
-      end_time: tonightStart + (110 * 60 * 1000),
-      channels: ['Movistar La Liga 4K', 'Viaplay Sports 1 4K', 'ESPN+ UHD'],
-      quality: '4K UHD • 60 FPS'
-    });
-  } else if (dayOfWeek === 6) {
-    const satPpvStart = getEpochMs(0, 22, 0);
-    fixtures.push({
-      id: 'evt-today-tonight',
-      category: 'ufc',
-      league: '🥊 UFC World Championship PPV Main Card',
-      league_color: 'from-red-600 to-amber-600',
-      is_live: false,
-      team_a: 'Alexandre Pantoja',
-      team_a_icon: '👑',
-      team_b: 'Joshua Van',
-      team_b_icon: '🥊',
-      venue: 'T-Mobile Arena, Las Vegas, NV',
-      start_time: satPpvStart,
-      end_time: satPpvStart + (180 * 60 * 1000),
-      channels: ['ESPN+ PPV UHD', 'TNT Sports Box Office 4K', 'Sony LIV 4K'],
-      quality: '4K UHD • PPV Included • Zero Delay'
-    });
-  } else {
-    fixtures.push({
-      id: 'evt-today-tonight',
-      category: 'football',
-      league: '🇪🇸 La Liga • El Clásico Primetime',
+      league: '🇪🇸 LaLiga EA Sports • Primetime',
       league_color: 'from-red-600 to-amber-600',
       is_live: false,
       team_a: 'Real Madrid',
@@ -281,183 +429,76 @@ function generateDynamicFixturesClientSide() {
       team_b: 'FC Barcelona',
       team_b_icon: '🔵',
       venue: 'Santiago Bernabéu, Madrid',
-      start_time: tonightStart,
-      end_time: tonightStart + (110 * 60 * 1000),
-      channels: ['Movistar La Liga 4K', 'ITV 4K UHD', 'ESPN+ UHD'],
+      start_time: getFutureSlotMs(6, 0),
+      end_time: getFutureSlotMs(8, 0),
+      channels: ['Premier Sports 1 HD', 'Movistar LaLiga 4K', 'ESPN+ UHD'],
       quality: '4K UHD • 60 FPS • Dolby Atmos'
-    });
-  }
-
-  // 3. Tomorrow Marquee Fixture
-  const tomorrowStart = getEpochMs(1, 20, 0);
-  if (dayOfWeek === 1) { // Mon -> Tue
-    fixtures.push({
-      id: 'evt-tomorrow-clash',
-      category: 'football',
-      league: '🏆 UEFA Champions League • Matchday Marquee',
-      league_color: 'from-blue-600 to-indigo-600',
+    },
+    {
+      id: 'roll-ufc-1',
+      category: 'ufc',
+      league: '🥊 UFC Championship PPV Main Card',
+      league_color: 'from-red-600 to-amber-600',
       is_live: false,
-      team_a: 'Real Madrid',
-      team_a_icon: '⚪',
-      team_b: 'Bayern Munich',
-      team_b_icon: '🔴',
-      venue: 'Santiago Bernabéu, Madrid',
-      start_time: tomorrowStart,
-      end_time: tomorrowStart + (110 * 60 * 1000),
-      channels: ['TNT Sports 1 4K', 'Canal+ UHD', 'Paramount+ 4K'],
-      quality: '4K UHD • 60 FPS • Ultra HDR'
-    });
-  } else if (dayOfWeek === 2) { // Tue -> Wed
-    fixtures.push({
-      id: 'evt-tomorrow-clash',
-      category: 'football',
-      league: '🏆 UEFA Champions League • Matchday Marquee',
-      league_color: 'from-blue-600 to-indigo-600',
+      team_a: 'Main Event Title Bout',
+      team_a_icon: '👑',
+      team_b: '5-Round Championship',
+      team_b_icon: '🥊',
+      venue: 'T-Mobile Arena, Las Vegas',
+      start_time: getFutureSlotMs(8, 0),
+      end_time: getFutureSlotMs(11, 0),
+      channels: ['TNT Sports Box Office 4K', 'ESPN+ PPV UHD', 'DAZN PPV 4K'],
+      quality: '4K UHD • PPV Included at No Extra Cost'
+    },
+    {
+      id: 'roll-f1-1',
+      category: 'f1',
+      league: '🏎️ Formula 1 World Championship',
+      league_color: 'from-red-600 to-red-800',
       is_live: false,
-      team_a: 'Barcelona',
-      team_a_icon: '🔵',
-      team_b: 'Paris Saint-Germain',
-      team_b_icon: '🔴',
-      venue: 'Camp Nou, Barcelona',
-      start_time: tomorrowStart,
-      end_time: tomorrowStart + (110 * 60 * 1000),
-      channels: ['TNT Sports Ultimate 4K', 'RMC Sport 1 4K', 'Movistar Liga 4K'],
+      team_a: 'Red Bull / McLaren / Ferrari',
+      team_a_icon: '🏎️',
+      team_b: 'Grand Prix Main Race',
+      team_b_icon: '🏁',
+      venue: 'FIA Formula 1 International Circuit',
+      start_time: getFutureSlotMs(18, 0),
+      end_time: getFutureSlotMs(20, 30),
+      channels: ['Sky Sports F1 4K UHD', 'F1 TV Pro Native 60FPS', 'Canal+ F1 4K'],
+      quality: '4K UHD • 60 FPS Direct Supernode'
+    },
+    {
+      id: 'roll-basketball-1',
+      category: 'basketball',
+      league: '🏀 NBA Primetime Showcase',
+      league_color: 'from-orange-600 to-amber-500',
+      is_live: false,
+      team_a: 'Los Angeles Lakers',
+      team_a_icon: '🏀',
+      team_b: 'Boston Celtics',
+      team_b_icon: '🍀',
+      venue: 'Crypto.com Arena, Los Angeles',
+      start_time: getFutureSlotMs(5, 0),
+      end_time: getFutureSlotMs(7, 30),
+      channels: ['TNT Sports NBA 4K', 'ESPN 4K', 'NBA TV UHD'],
       quality: '4K UHD • 60 FPS'
-    });
-  } else if (dayOfWeek === 5) { // Fri -> Sat
-    fixtures.push({
-      id: 'evt-tomorrow-clash',
-      category: 'football',
-      league: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League • Saturday Derby',
-      league_color: 'from-purple-600 to-pink-600',
+    },
+    {
+      id: 'roll-tennis-1',
+      category: 'tennis',
+      league: '🎾 ATP Tour Masters 1000',
+      league_color: 'from-emerald-600 to-teal-700',
       is_live: false,
-      team_a: 'Arsenal FC',
-      team_a_icon: '🔴',
-      team_b: 'Chelsea FC',
-      team_b_icon: '🔵',
-      venue: 'Emirates Stadium, London',
-      start_time: getEpochMs(1, 17, 30),
-      end_time: getEpochMs(1, 17, 30) + (110 * 60 * 1000),
-      channels: ['Sky Sports Premier League 4K', 'Peacock UHD', 'Canal+ Foot 4K'],
-      quality: '4K UHD • 60 FPS • Ultra HDR'
-    });
-  } else {
-    fixtures.push({
-      id: 'evt-tomorrow-clash',
-      category: 'football',
-      league: '🏆 Continental Championship • Clash of Giants',
-      league_color: 'from-blue-600 to-indigo-600',
-      is_live: false,
-      team_a: 'Inter Milan',
-      team_a_icon: '🔵',
-      team_b: 'Atlético de Madrid',
-      team_b_icon: '⚪',
-      venue: 'San Siro, Milan',
-      start_time: tomorrowStart,
-      end_time: tomorrowStart + (110 * 60 * 1000),
-      channels: ['TNT Sports 2 4K', 'DAZN 1 4K', 'Canal+ UHD'],
-      quality: '4K UHD • 60 FPS'
-    });
-  }
-
-  // 4. Upcoming Saturday UFC / Boxing Title PPV
-  const satTime = getEpochMs(daysUntilSat, 22, 0);
-  fixtures.push({
-    id: 'evt-upcoming-ufc-ppv',
-    category: 'ufc',
-    league: '🥊 WBC World Welterweight Championship PPV',
-    league_color: 'from-amber-600 to-yellow-500',
-    is_live: false,
-    team_a: 'Ryan Garcia',
-    team_a_icon: '🥊',
-    team_b: 'Conor Benn',
-    team_b_icon: '🇬🇧',
-    venue: 'T-Mobile Arena, Las Vegas, NV',
-    start_time: satTime,
-    end_time: satTime + (180 * 60 * 1000),
-    channels: ['DAZN PPV VIP 4K', 'TNT Sports Box Office', 'Sky Sports Box Office'],
-    quality: '4K UHD • PPV Included at No Extra Cost'
-  });
-
-  // 5. Upcoming Sunday Premier League Derby
-  const sunTime = getEpochMs(daysUntilSun, 16, 30);
-  fixtures.push({
-    id: 'evt-upcoming-epl-derby',
-    category: 'football',
-    league: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League • The Manchester Derby',
-    league_color: 'from-purple-600 to-pink-600',
-    is_live: false,
-    team_a: 'Manchester United',
-    team_a_icon: '🔴',
-    team_b: 'Manchester City',
-    team_b_icon: '🔵',
-    venue: 'Old Trafford, Manchester',
-    start_time: sunTime,
-    end_time: sunTime + (110 * 60 * 1000),
-    channels: ['Sky Sports Premier League 4K', 'Peacock Premium UHD', 'USA Network 4K'],
-    quality: '4K UHD • 60 FPS • Ultra HDR'
-  });
-
-  // 6. Formula 1 Grand Prix Raceday
-  const f1Time = getEpochMs(daysUntilSun, 14, 0);
-  fixtures.push({
-    id: 'evt-upcoming-f1',
-    category: 'f1',
-    league: '🏎️ Formula 1 Grand Prix World Championship',
-    league_color: 'from-red-600 to-red-800',
-    is_live: false,
-    team_a: 'Max Verstappen (Red Bull)',
-    team_a_icon: '🏎️',
-    team_b: 'Lando Norris (McLaren)',
-    team_b_icon: '🏎️',
-    venue: 'Grand Prix Circuit • Lights Out 15:00 CEST',
-    start_time: f1Time,
-    end_time: f1Time + (130 * 60 * 1000),
-    channels: ['Sky Sports F1 4K UHD', 'F1 TV Pro Native 60FPS', 'Canal+ F1 4K'],
-    quality: '4K UHD • 60 FPS Direct Satellite Supernode'
-  });
-
-  // 7. Tennis Championship Final
-  const tennisOffset = dayOfWeek <= 3 ? (3 - dayOfWeek) : (6 - dayOfWeek);
-  const tennisTime = getEpochMs(tennisOffset, 19, 0);
-  fixtures.push({
-    id: 'evt-upcoming-tennis',
-    category: 'tennis',
-    league: '🎾 ATP Masters 1000 Championship Final',
-    league_color: 'from-emerald-600 to-teal-700',
-    is_live: false,
-    team_a: 'Carlos Alcaraz',
-    team_a_icon: '🇪🇸',
-    team_b: 'Jannik Sinner',
-    team_b_icon: '🇮🇹',
-    venue: 'Center Court • 4K Native HDR Feed',
-    start_time: tennisTime,
-    end_time: tennisTime + (150 * 60 * 1000),
-    channels: ['Sky Sports Tennis 4K', 'ESPN+ UHD', 'Eurosport 4K UHD'],
-    quality: 'Native 4K UHD • 60 FPS'
-  });
-
-  // 8. Basketball Primetime
-  const bballOffset = dayOfWeek % 2 === 0 ? 1 : 2;
-  const bballTime = getEpochMs(bballOffset, 20, 0);
-  fixtures.push({
-    id: 'evt-upcoming-basketball',
-    category: 'basketball',
-    league: '🏀 NBA Primetime Blockbuster',
-    league_color: 'from-orange-600 to-amber-500',
-    is_live: false,
-    team_a: 'Boston Celtics',
-    team_a_icon: '🍀',
-    team_b: 'Denver Nuggets',
-    team_b_icon: '🏔️',
-    venue: 'TD Garden, Boston, MA',
-    start_time: bballTime,
-    end_time: bballTime + (140 * 60 * 1000),
-    channels: ['ESPN 4K', 'ABC HD 60FPS', 'NBA TV UHD'],
-    quality: '4K UHD 60FPS'
-  });
-
-  return fixtures;
+      team_a: 'Carlos Alcaraz',
+      team_a_icon: '🇪🇸',
+      team_b: 'Jannik Sinner',
+      team_b_icon: '🇮🇹',
+      venue: 'Center Court • 4K HDR Feed',
+      start_time: getFutureSlotMs(10, 0),
+      end_time: getFutureSlotMs(12, 30),
+      channels: ['Sky Sports Tennis 4K', 'Tennis TV UHD', 'Eurosport 4K'],
+      quality: 'Native 4K UHD • 60 FPS'
+    }
+  ];
 }
 
 /* -------------------------------------------------------------
@@ -496,31 +537,39 @@ function updateCategoryCounts() {
 }
 
 /* -------------------------------------------------------------
-   3. Render Match Grid
+   3. Render Match Grid (With Real Team Logos & Live Scoreboards)
    ------------------------------------------------------------- */
+function renderTeamBadge(logoUrl, fallbackIcon, name) {
+  if (logoUrl) {
+    return `<img src="${logoUrl}" alt="${name}" class="w-6 h-6 sm:w-7 sm:h-7 object-contain shrink-0" loading="lazy" onerror="this.style.display='none'">`;
+  }
+  return `<span class="text-xl shrink-0">${fallbackIcon || '🏆'}</span>`;
+}
+
 function renderSportsGrid() {
   const container = document.getElementById('sports-events-grid');
   if (!container) return;
 
-  const filtered = SPORTS_EVENTS.filter(e => {
+  const now = Date.now();
+  // Filter out any event that ended in the past
+  const activeEvents = SPORTS_EVENTS.filter(e => !e.end_time || e.end_time > now);
+
+  const filtered = activeEvents.filter(e => {
     return activeSportsCategory === 'all' || e.category === activeSportsCategory;
   });
 
   if (filtered.length === 0) {
     container.innerHTML = `
       <div class="col-span-full py-12 text-center text-slate-500 glass-panel rounded-3xl border border-[#263247]">
-        No matches scheduled in this category right now. Check back soon!
+        No matches scheduled in this category right now. Click Refresh Live Schedule above!
       </div>
     `;
     return;
   }
 
-  const now = Date.now();
-
   container.innerHTML = filtered.map(evt => {
     const isCurrentlyLive = evt.is_live || (evt.start_time <= now && (!evt.end_time || evt.end_time > now));
     
-    // Day label calculation
     const evtDate = new Date(evt.start_time);
     const nowDate = new Date();
     const isSameDay = evtDate.toDateString() === nowDate.toDateString();
@@ -541,6 +590,10 @@ function renderSportsGrid() {
       const formattedDate = evtDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
       dateLabel = '📅 ' + formattedDate + ' at ' + formattedTime;
     }
+
+    const vsOrScoreBadge = (isCurrentlyLive && evt.live_score)
+      ? `<span class="text-xs px-2.5 py-1 rounded-lg bg-red-600/20 text-red-400 font-mono font-black border border-red-500/40 shrink-0">${evt.live_score}</span>`
+      : `<span class="text-xs px-2 py-0.5 rounded bg-[#161D2D] text-slate-400 font-sans font-bold border border-[#263247] shrink-0">VS</span>`;
 
     return `
       <div class="glass-panel rounded-3xl p-6 border ${isCurrentlyLive ? 'border-red-500/60 shadow-[0_0_30px_rgba(239,68,68,0.15)]' : 'border-[#263247] hover:border-blue-500/50'} bg-[#101522] transition-all flex flex-col justify-between space-y-5 shadow-xl relative overflow-hidden group">
@@ -563,15 +616,15 @@ function renderSportsGrid() {
 
         <!-- Match Versus Card -->
         <div class="bg-[#0C111D] rounded-2xl p-4 border border-[#263247] space-y-3">
-          <div class="flex items-center justify-between font-heading font-extrabold text-sm sm:text-base text-white">
-            <div class="flex items-center gap-2">
-              <span class="text-xl">${evt.team_a_icon}</span>
-              <span>${evt.team_a}</span>
+          <div class="flex items-center justify-between gap-2 font-heading font-extrabold text-xs sm:text-sm text-white">
+            <div class="flex items-center gap-2 min-w-0 flex-1">
+              ${renderTeamBadge(evt.team_a_logo, evt.team_a_icon, evt.team_a)}
+              <span class="truncate">${evt.team_a}</span>
             </div>
-            <span class="text-xs px-2 py-0.5 rounded bg-[#161D2D] text-slate-400 font-sans font-bold border border-[#263247]">VS</span>
-            <div class="flex items-center gap-2 text-right">
-              <span>${evt.team_b}</span>
-              <span class="text-xl">${evt.team_b_icon}</span>
+            ${vsOrScoreBadge}
+            <div class="flex items-center justify-end gap-2 text-right min-w-0 flex-1">
+              <span class="truncate">${evt.team_b}</span>
+              ${renderTeamBadge(evt.team_b_logo, evt.team_b_icon, evt.team_b)}
             </div>
           </div>
           
@@ -601,7 +654,7 @@ function renderSportsGrid() {
         <div>
           <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block mb-1.5">Broadcast 4K Feeds:</span>
           <div class="flex flex-wrap gap-1.5">
-            ${evt.channels.map(ch => `
+            ${(evt.channels || []).map(ch => `
               <span class="text-[10px] px-2 py-0.5 rounded bg-[#0C111D] border border-[#263247] text-slate-300 font-medium">
                 📺 ${ch}
               </span>
@@ -639,7 +692,6 @@ function updateAllCountdowns() {
     if (diff <= 0) {
       clock.innerHTML = `<span class="text-red-400 animate-pulse font-extrabold">🔴 STREAMING LIVE NOW</span>`;
       
-      // Update data model if not already live
       const matchObj = SPORTS_EVENTS.find(e => e.id === eventId);
       if (matchObj && !matchObj.is_live) {
         matchObj.is_live = true;
@@ -664,7 +716,6 @@ function updateAllCountdowns() {
   });
 
   if (hasTransitionedToLive) {
-    // Re-render to reflect new red border, LIVE NOW badge, and CTA text
     renderSportsGrid();
   }
 }

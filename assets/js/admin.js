@@ -20,7 +20,7 @@ let appSettings = {
   supplier_panel_url: "https://panel.example.com",
   renewal_discount_percent: 15,
   paypal_email: "wasifali740@gmail.com",
-  paypal_me_link: "paypal.me/adilfarooq909",
+  paypal_me_link: "paypal.me/SheerazAli806",
   paypal_mode: "paypal_me"
 };
 
@@ -1946,7 +1946,44 @@ function initSettingsForms() {
         const data = await res.json();
         if (data.success) {
           showToast('Master password updated successfully!', 'success');
-          closeChangePasswordModal();
+          const persistBox = document.getElementById('pw-change-persistence-box');
+          if (persistBox && (data.settings_json || data.admin_password_hash)) {
+            pwForm.classList.add('hidden');
+            persistBox.classList.remove('hidden');
+
+            const jsonStr = data.settings_json || JSON.stringify({
+              ...appSettings,
+              admin_password: data.admin_password_hash,
+              password_changed_runtime: true
+            }, null, 2);
+
+            const copyBtn = document.getElementById('btn-copy-updated-settings-json');
+            if (copyBtn) {
+              copyBtn.onclick = () => {
+                navigator.clipboard.writeText(jsonStr).then(() => {
+                  showToast('Copied updated settings.json! Paste it into data/settings.json on GitHub.', 'success');
+                  copyBtn.textContent = '✅ Copied settings.json!';
+                });
+              };
+            }
+            const dlBtn = document.getElementById('btn-download-updated-settings-json');
+            if (dlBtn) {
+              dlBtn.onclick = () => {
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'settings.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('Downloaded updated settings.json!', 'success');
+              };
+            }
+          } else {
+            closeChangePasswordModal();
+          }
         } else {
           showToast(data.message || 'Failed to update password.', 'error');
         }
@@ -2051,7 +2088,7 @@ function openPayPalSettingsModal() {
   const modal = document.getElementById('paypal-settings-modal');
   if (document.getElementById('set-paypal-mode')) document.getElementById('set-paypal-mode').value = appSettings.paypal_mode || "paypal_me";
   if (document.getElementById('set-paypal-email')) document.getElementById('set-paypal-email').value = appSettings.paypal_email || "wasifali740@gmail.com";
-  if (document.getElementById('set-paypal-me-link')) document.getElementById('set-paypal-me-link').value = appSettings.paypal_me_link || "paypal.me/adilfarooq909";
+  if (document.getElementById('set-paypal-me-link')) document.getElementById('set-paypal-me-link').value = appSettings.paypal_me_link || "paypal.me/SheerazAli806";
   if (document.getElementById('set-paypal-client-id')) document.getElementById('set-paypal-client-id').value = appSettings.paypal_client_id || "";
   if (document.getElementById('set-paypal-instructions')) document.getElementById('set-paypal-instructions').value = appSettings.paypal_instructions || "";
   if (modal) modal.classList.remove('hidden');
@@ -2064,7 +2101,14 @@ function closePayPalSettingsModal() {
 function openChangePasswordModal() {
   const modal = document.getElementById('change-password-modal');
   const form = document.getElementById('change-password-form');
-  if (form) form.reset();
+  const persistBox = document.getElementById('pw-change-persistence-box');
+  if (form) {
+    form.reset();
+    form.classList.remove('hidden');
+  }
+  if (persistBox) persistBox.classList.add('hidden');
+  const copyBtn = document.getElementById('btn-copy-updated-settings-json');
+  if (copyBtn) copyBtn.textContent = '📋 Copy Updated settings.json';
   if (modal) modal.classList.remove('hidden');
 }
 function closeChangePasswordModal() {

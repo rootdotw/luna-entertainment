@@ -194,6 +194,16 @@ function parseQueryParams() {
   }
   if (currParam && CHECKOUT_PRICING.currencies[currParam.toUpperCase()]) {
     checkoutState.currency = currParam.toUpperCase();
+  } else {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      if (tz.startsWith('America/')) {
+        checkoutState.currency = 'USD';
+      } else if (tz.startsWith('Europe/')) {
+        const ukZones = ['Europe/London', 'Europe/Belfast', 'Europe/Guernsey', 'Europe/Isle_of_Man', 'Europe/Jersey'];
+        checkoutState.currency = ukZones.includes(tz) ? 'GBP' : 'EUR';
+      }
+    } catch (e) {}
   }
 
   // Handle return from PayPal
@@ -835,7 +845,7 @@ window.executePayPalDirectLoginCheckout = window.executePayPalPayment = window.e
   } catch (e) {}
 
   let paypalUrl = '';
-  let paypalMe = (appSettings?.paypal_me_link || 'https://paypal.me/adilfarooq909').trim();
+  let paypalMe = (appSettings?.paypal_me_link || 'https://paypal.me/SheerazAli806').trim();
   if (paypalMe) {
     if (!paypalMe.startsWith('http://') && !paypalMe.startsWith('https://')) {
       paypalMe = 'https://' + paypalMe;
@@ -1024,7 +1034,8 @@ window.showPayPalScreenshotView = function(orderId, email, name) {
   if (emailEl) emailEl.textContent = eml || 'your email';
 
   const waNumber = (appSettings?.support_whatsapp || SUPPORT_WHATSAPP_NUMBER || '447413469398').replace(/[^0-9]/g, '');
-  const waMsg = `Hello Luna Stream! I completed my PayPal payment for Order: ${ordId} (${eml}). Here is my payment screenshot for instant activation:`;
+  const pricing = calculateCurrentPricing();
+  const waMsg = `Hello Luna Stream! I completed my PayPal payment for Order: ${ordId || 'NEW'} | Plan: ${pricing.planTitle} (${checkoutState.devices} Screen${checkoutState.devices > 1 ? 's' : ''}) | Amount: ${pricing.symbol}${pricing.total} ${checkoutState.currency} | Email: ${eml}. Here is my payment screenshot for instant activation:`;
   const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMsg)}`;
 
   if (waBtn) {
