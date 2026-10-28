@@ -1591,7 +1591,7 @@
           </div>
           <div>
             <label class="block font-bold text-slate-300 mb-1">PayPal.Me Handle / Link</label>
-            <input type="text" id="set-paypal-me-link" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-3.5 py-2.5 text-white font-mono text-xs focus:outline-none focus:border-blue-500" placeholder="paypal.me/adilfarooq909">
+            <input type="text" id="set-paypal-me-link" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-3.5 py-2.5 text-white font-mono text-xs focus:outline-none focus:border-blue-500" placeholder="paypal.me/SheerazAli806">
           </div>
         </div>
 
@@ -1672,6 +1672,44 @@
           </button>
         </div>
       </form>
+
+      <!-- Cloud / GitHub Persistence Box (Shown after password update) -->
+      <div id="pw-change-persistence-box" class="hidden space-y-3 text-xs pt-2">
+        <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 space-y-1.5">
+          <div class="font-bold text-sm text-emerald-400 flex items-center gap-2">
+            <span>✅ Master Password Updated!</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Your new password is now active. Because Render Free Tier resets files from GitHub whenever the server sleeps or redeploys, do <strong>either step below once</strong> so your password never resets to <code class="text-amber-300">admin</code>:
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-[#0C111D] border border-[#263247] space-y-2.5">
+          <div class="font-bold text-white text-xs">Option A (Fastest): Update <code class="text-blue-400">data/settings.json</code> in GitHub</div>
+          <p class="text-[11px] text-slate-400">Click below to copy your complete updated <code class="text-slate-200">settings.json</code> (with your encrypted new password) and paste it into <code class="text-slate-200">data/settings.json</code> on GitHub:</p>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" id="btn-copy-updated-settings-json" class="flex-1 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-all cursor-pointer">
+              📋 Copy Updated settings.json
+            </button>
+            <button type="button" id="btn-download-updated-settings-json" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-[#263247] transition-all cursor-pointer">
+              📥 Download File
+            </button>
+          </div>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-[#0C111D] border border-[#263247] space-y-1.5">
+          <div class="font-bold text-white text-xs">Option B: Set <code class="text-purple-400">ADMIN_PASSWORD</code> in Render</div>
+          <p class="text-[11px] text-slate-400 leading-relaxed">
+            In your Render Dashboard → <strong>Environment</strong> tab, add Environment Variable <code class="text-purple-300 font-mono">ADMIN_PASSWORD</code> set to your new password.
+          </p>
+        </div>
+
+        <div class="pt-1 flex justify-end">
+          <button type="button" onclick="closeChangePasswordModal()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs cursor-pointer">
+            Done & Close
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 

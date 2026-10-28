@@ -195,11 +195,25 @@ function Add-AuditLog([string]$action, [string]$actor, [string]$details) {
     Write-JsonFileSafe "audit_log.json" $log
 }
 
+function Set-ObjectProperty($obj, [string]$propName, $val) {
+    if ($null -eq $obj) { return }
+    if ($obj -is [hashtable]) {
+        $obj[$propName] = $val
+        return
+    }
+    if ($obj.PSObject.Properties[$propName]) {
+        $obj.$propName = $val
+    } else {
+        $obj | Add-Member -NotePropertyName $propName -NotePropertyValue $val -Force
+    }
+}
+
 function Initialize-DefaultData() {
     $s = Read-JsonFileSafe "settings.json" $null
+    $initPass = if ($env:ADMIN_PASSWORD) { [string]$env:ADMIN_PASSWORD } else { "admin" }
     if (-not $s) {
         $s = @{
-            admin_password = Get-PasswordHash "admin"
+            admin_password = Get-PasswordHash $initPass
             auth_token = "ps_sec_token_99281a8b"
             brand_name = "Luna Stream IPTV"
             m3u_server_template = "http://line.lunaentertainment.online:8080/get.php?username={username}&password={password}&type=m3u_plus&output=ts"
@@ -207,11 +221,14 @@ function Initialize-DefaultData() {
             support_whatsapp = "447413469398"
             support_telegram = "LunaStreamOfficial"
             paypal_email = "wasifali740@gmail.com"
-            paypal_me_link = "https://paypal.me/adilfarooq909"
+            paypal_me_link = "https://paypal.me/SheerazAli806"
             paypal_mode = "paypal_me"
-            paypal_instructions = "Send exact amount to paypal.me/adilfarooq909. 256-Bit SSL Instant Verification."
+            paypal_instructions = "MAKE SURE THE PAYMENT IS F&F (Family and Friends) OR WE WONT BE LIABLE. Thank You"
             announcement_enabled = $false
         }
+        Write-JsonFileSafe "settings.json" $s
+    } elseif ($env:ADMIN_PASSWORD -and ($s.password_changed_runtime -ne $true)) {
+        Set-ObjectProperty $s 'admin_password' (Get-PasswordHash ([string]$env:ADMIN_PASSWORD))
         Write-JsonFileSafe "settings.json" $s
     }
 }
@@ -265,11 +282,60 @@ function Update-MemoryPricingCatalog($catalog) {
 
 function Get-PricingCatalog {
     $catalog = Read-JsonFileSafe "pricing.json" $null
-    if ($catalog) {
+    if ($catalog -and $catalog.plans) {
         Update-MemoryPricingCatalog $catalog
         return $catalog
     }
-    return $null
+    
+    # Auto-seed default pricing catalog if missing
+    $defaultCatalog = @{
+        currencies = @{
+            GBP = @{ symbol = "£"; suffix = "GBP" }
+            USD = @{ symbol = "$"; suffix = "USD" }
+            EUR = @{ symbol = "€"; suffix = "EUR" }
+        }
+        plans = @{
+            '3m' = @{
+                id = "3m"; title = "3 Months Pass"; name = "3 Months Pass"; duration_months = 3; months = 3; extra_months = 0
+                badge = "STARTER SAVER"; active = $true; popular = $false
+                channels = "20,000+ 4K & UHD Channels"; vod = "60,000+ Movies & Series"
+                pricing = @{
+                    '1' = @{ GBP = 25; USD = 35; EUR = 30 }
+                    '2' = @{ GBP = 35; USD = 49; EUR = 40 }
+                    '3' = @{ GBP = 49; USD = 69; EUR = 59 }
+                    '5' = @{ GBP = 79; USD = 109; EUR = 95 }
+                }
+                previous_pricing = @{}
+            }
+            '6m' = @{
+                id = "6m"; title = "6 Months Pass"; name = "6 Months Pass"; duration_months = 6; months = 6; extra_months = 0
+                badge = "EXTENDED SAVER"; active = $true; popular = $false
+                channels = "20,000+ 4K & UHD Channels"; vod = "60,000+ Movies & Series"
+                pricing = @{
+                    '1' = @{ GBP = 40; USD = 55; EUR = 47 }
+                    '2' = @{ GBP = 59; USD = 79; EUR = 69 }
+                    '3' = @{ GBP = 79; USD = 109; EUR = 95 }
+                    '5' = @{ GBP = 129; USD = 179; EUR = 149 }
+                }
+                previous_pricing = @{}
+            }
+            '12m' = @{
+                id = "12m"; title = "12 Months Ultimate Pass"; name = "12 Months Ultimate Pass"; duration_months = 12; months = 12; extra_months = 2
+                badge = "⭐ BEST VALUE"; active = $true; popular = $true
+                channels = "20,000+ 4K & UHD Channels"; vod = "60,000+ Movies & Series"
+                pricing = @{
+                    '1' = @{ GBP = 65; USD = 89; EUR = 76 }
+                    '2' = @{ GBP = 99; USD = 135; EUR = 115 }
+                    '3' = @{ GBP = 129; USD = 179; EUR = 149 }
+                    '5' = @{ GBP = 199; USD = 269; EUR = 229 }
+                }
+                previous_pricing = @{}
+            }
+        }
+    }
+    Write-JsonFileSafe "pricing.json" $defaultCatalog
+    Update-MemoryPricingCatalog $defaultCatalog
+    return $defaultCatalog
 }
 
 function Get-ValidatedPrice([string]$planId, [int]$devices, [string]$currency) {
@@ -497,6 +563,10 @@ function Send-JsonResponse($response, [int]$statusCode, $data) {
 # --- Email Notification System ---
 function Set-ObjectProperty($obj, [string]$propName, $val) {
     if ($null -eq $obj) { return }
+    if ($obj -is [hashtable]) {
+        $obj[$propName] = $val
+        return
+    }
     if ($obj.PSObject.Properties[$propName]) {
         $obj.$propName = $val
     } else {
@@ -1028,17 +1098,22 @@ try {
                         continue
                     }
                     $settings = Read-JsonFileSafe "settings.json" @{}
-                    $providedPass = if ($bodyJson) { $bodyJson.password } else { "" }
-                    $targetPass = if ($settings.admin_password) { $settings.admin_password } else { "admin" }
+                    $providedPass = if ($bodyJson) { [string]$bodyJson.password } else { "" }
+                    $targetPass = if ($settings.admin_password) { [string]$settings.admin_password } elseif ($env:ADMIN_PASSWORD) { [string]$env:ADMIN_PASSWORD } else { "admin" }
                     
-                    if (Test-PasswordHash $providedPass $targetPass) {
-                        if (-not $settings.admin_password -or -not $settings.admin_password.Contains(':')) {
-                            $settings.admin_password = Get-PasswordHash $providedPass
-                            if (-not $settings.brand_name) { $settings.brand_name = "Luna Stream IPTV" }
-                            if (-not $settings.support_whatsapp) { $settings.support_whatsapp = "447413469398" }
-                            if (-not $settings.support_telegram) { $settings.support_telegram = "LunaStreamOfficial" }
-                            if (-not $settings.paypal_me_link) { $settings.paypal_me_link = "https://paypal.me/adilfarooq909" }
-                            if (-not $settings.paypal_mode) { $settings.paypal_mode = "paypal_me" }
+                    $isMatch = (Test-PasswordHash $providedPass $targetPass)
+                    if (-not $isMatch -and $env:ADMIN_PASSWORD -and ($settings.password_changed_runtime -ne $true) -and ($providedPass -eq [string]$env:ADMIN_PASSWORD)) {
+                        $isMatch = $true
+                    }
+
+                    if ($isMatch) {
+                        if (-not $settings.admin_password -or -not ([string]$settings.admin_password).Contains(':')) {
+                            Set-ObjectProperty $settings 'admin_password' (Get-PasswordHash $providedPass)
+                            if (-not $settings.brand_name) { Set-ObjectProperty $settings 'brand_name' "Luna Stream IPTV" }
+                            if (-not $settings.support_whatsapp) { Set-ObjectProperty $settings 'support_whatsapp' "447413469398" }
+                            if (-not $settings.support_telegram) { Set-ObjectProperty $settings 'support_telegram' "LunaStreamOfficial" }
+                            if (-not $settings.paypal_me_link) { Set-ObjectProperty $settings 'paypal_me_link' "https://paypal.me/SheerazAli806" }
+                            if (-not $settings.paypal_mode) { Set-ObjectProperty $settings 'paypal_mode' "paypal_me" }
                             Write-JsonFileSafe "settings.json" $settings
                         }
                         $token = New-SessionToken
@@ -1120,18 +1195,23 @@ try {
                     $fixtures = Read-JsonFileSafe "sports_fixtures.json" $null
                     $todayStr = (Get-Date).ToString("yyyy-MM-dd")
                     if (-not $fixtures -or $fixtures.generated_date -ne $todayStr) {
-                        $genScript = Join-Path $Folder "scripts\generate_sports_fixtures.py"
-                        if (Test-Path $genScript) {
+                        # Only regenerate when the generator script AND python exist (not available on Render)
+                        $genScript = Join-Path (Join-Path $Folder "scripts") "generate_sports_fixtures.py"
+                        if ((Test-Path $genScript) -and (Get-Command python -ErrorAction SilentlyContinue)) {
                             try {
                                 & python $genScript | Out-Null
-                                $fixtures = Read-JsonFileSafe "sports_fixtures.json" $null
-                            } catch {}
+                                $fresh = Read-JsonFileSafe "sports_fixtures.json" $null
+                                if ($fresh -and $fresh.generated_date -eq $todayStr) { $fixtures = $fresh } else { $fixtures = $null }
+                            } catch { $fixtures = $null }
+                        } else {
+                            $fixtures = $null
                         }
                     }
-                    if ($fixtures) {
+                    if ($fixtures -and $fixtures.generated_date -eq $todayStr) {
                         Send-JsonResponse $response 200 $fixtures
                     } else {
-                        Send-JsonResponse $response 500 @{ success = $false; message = "Fixtures unavailable" }
+                        # Empty list -> frontend uses its live ESPN + dynamic rolling calendar engine
+                        Send-JsonResponse $response 200 @{ generated_date = $todayStr; fixtures = @(); source = "live_espn_client" }
                     }
                 }
                 # Admin Sports Refresh
@@ -1794,13 +1874,24 @@ try {
                 elseif ($apiRoute -eq "admin/change-password" -and $method -eq "POST") {
                     if (-not (Test-AdminAuth $request)) { Send-JsonResponse $response 401 @{ success = $false; message = 'Authentication required' }; continue }
                     $settings = Read-JsonFileSafe "settings.json" @{}
-                    $current = $bodyJson.current_password
-                    $newPass = $bodyJson.new_password
-                    if (Test-PasswordHash $current $settings.admin_password) {
-                        $settings.admin_password = Get-PasswordHash $newPass
+                    $current = if ($bodyJson -and $bodyJson.current_password) { [string]$bodyJson.current_password } else { "" }
+                    $newPass = if ($bodyJson -and $bodyJson.new_password) { [string]$bodyJson.new_password } else { "" }
+                    if (-not $newPass -or $newPass.Trim().Length -lt 4) {
+                        Send-JsonResponse $response 400 @{ success = $false; message = "New password must be at least 4 characters" }
+                        continue
+                    }
+                    $targetPass = if ($settings.admin_password) { [string]$settings.admin_password } elseif ($env:ADMIN_PASSWORD) { [string]$env:ADMIN_PASSWORD } else { "admin" }
+                    $currentMatches = (Test-PasswordHash $current $targetPass) -or ($env:ADMIN_PASSWORD -and ($current -eq [string]$env:ADMIN_PASSWORD))
+                    if ($currentMatches) {
+                        $newHash = Get-PasswordHash $newPass
+                        Set-ObjectProperty $settings 'admin_password' $newHash
+                        Set-ObjectProperty $settings 'password_changed_runtime' $true
                         Write-JsonFileSafe "settings.json" $settings
                         Add-AuditLog "PASSWORD_CHANGE" "Admin" "Admin password changed"
-                        Send-JsonResponse $response 200 @{ success = $true }
+                        Send-JsonResponse $response 200 @{
+                            success = $true
+                            admin_password_hash = $newHash
+                        }
                     } else {
                         Send-JsonResponse $response 400 @{ success = $false; message = "Invalid current password" }
                     }

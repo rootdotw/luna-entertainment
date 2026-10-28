@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
@@ -207,7 +207,20 @@
       </p>
     </div>
 
-        <!-- Sports Category Filter Tabs -->
+    <!-- Live Schedule Sync Status Bar -->
+    <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-[#101522]/90 border border-[#263247] max-w-3xl mx-auto text-xs">
+      <div class="flex items-center gap-2 text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="sports-sync-status" class="font-semibold text-emerald-400">Live Global Sports Feed Active</span>
+        <span class="text-slate-600">•</span>
+        <span id="sports-last-synced" class="text-[11px] text-slate-400">Auto-updating real-time fixtures</span>
+      </div>
+      <button type="button" id="btn-refresh-sports" onclick="refreshSportsManual()" class="px-3 py-1 rounded-lg bg-[#0C111D] hover:bg-blue-600/20 border border-[#263247] hover:border-blue-500/40 text-blue-400 font-bold text-[11px] transition-all cursor-pointer flex items-center gap-1.5">
+        <span>🔄 Refresh Live Schedule</span>
+      </button>
+    </div>
+
+    <!-- Sports Category Filter Tabs -->
     <div class="flex items-center justify-center gap-2 overflow-x-auto pb-2">
       <button class="sports-filter-btn active px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white transition-all" data-category="all">
         🌟 All Events (<span id="count-all">0</span>)
