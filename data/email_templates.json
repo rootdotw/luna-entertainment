@@ -1,0 +1,42 @@
+{
+  "ORDER_RECEIVED": {
+    "subject": "Order Received: {{order_id}} — Luna Stream IPTV",
+    "body_text": "Hello {{customer_name}},\n\nThank you for choosing Luna Stream IPTV! We have received your order ({{order_id}}) for {{plan_title}} ({{devices_count}} device(s)).\n\nTotal Amount: {{total_amount}} {{currency}}\nStatus: Payment Verification Pending\n\nIf you have already submitted your payment via PayPal, our technical desk is verifying your payment and preparing your streaming lines.\n\nBest regards,\nLuna Stream Support Team\nhttps://lunaentertainment.online",
+    "variables": ["customer_name", "order_id", "plan_title", "devices_count", "total_amount", "currency"]
+  },
+  "PAYMENT_CONFIRMED": {
+    "subject": "Payment Confirmed for Order {{order_id}} — Luna Stream IPTV",
+    "body_text": "Hello {{customer_name}},\n\nGreat news! Your payment of {{amount}} {{currency}} for Order {{order_id}} has been confirmed.\n\nYour 4K streaming line is now being activated on our network. Your credentials will be dispatched shortly.\n\nYou can also track and view your active service in the Client Portal:\nhttps://lunaentertainment.online/portal.html\n\nBest regards,\nLuna Stream Billing & Accounts",
+    "variables": ["customer_name", "order_id", "amount", "currency"]
+  },
+  "CREDENTIALS_DELIVERED": {
+    "subject": "Your Luna Stream 4K IPTV Credentials & Setup Guide [{{order_id}}]",
+    "body_text": "Hello {{customer_name}},\n\nYour Luna Stream IPTV subscription is now ACTIVE and ready to stream!\n\n=== SUBSCRIPTION DETAILS ===\nOrder ID: {{order_id}}\nPlan: {{plan_title}}\nValid Until: {{end_date}}\n\n=== YOUR STREAMING CREDENTIALS ===\nServer Portal: {{server_url}}\nUsername: {{xtream_username}}\nPassword: {{xtream_password}}\nM3U Playlist URL:\n{{m3u_url}}\n\n=== EASY SETUP GUIDE ===\n1. Download IPTV Smarters Pro or TiviMate on your device.\n2. Choose 'Login with Xtream Codes API'.\n3. Enter the Server Portal, Username, and Password above.\n\nDetailed step-by-step instructions available here:\nhttps://lunaentertainment.online/setup.html\n\nNeed assistance? Our engineers are on WhatsApp: https://wa.me/447882507089\n\nHappy Streaming!\nLuna Stream Team",
+    "variables": ["customer_name", "order_id", "plan_title", "end_date", "server_url", "xtream_username", "xtream_password", "m3u_url"]
+  },
+  "TRIAL_DISPATCHED": {
+    "subject": "Your 24-Hour Free Trial is Ready — Luna Stream IPTV",
+    "body_text": "Hello {{customer_name}},\n\nYour complimentary 24-hour test line has been activated!\n\n=== TEST CREDENTIALS ===\nDevice: {{device_type}}\nServer Portal: {{server_url}}\nUsername: {{xtream_username}}\nPassword: {{xtream_password}}\nM3U URL: {{m3u_url}}\n\nYour test line includes full access to 20,000+ live channels, sports passes, and 4K movies.\n\nSetup Guide: https://lunaentertainment.online/setup.html\nReady to upgrade to a full plan? Visit: https://lunaentertainment.online/pricing.html\n\nEnjoy,\nLuna Stream Support",
+    "variables": ["customer_name", "device_type", "server_url", "xtream_username", "xtream_password", "m3u_url"]
+  },
+  "EXPIRY_REMINDER_7D": {
+    "subject": "Reminder: Your Luna Stream Subscription Expires in 7 Days",
+    "body_text": "Hello {{customer_name}},\n\nThis is a friendly reminder that your Luna Stream subscription ({{subscription_id}}) will expire in 7 days on {{end_date}}.\n\nTo ensure uninterrupted 4K streaming and preserve your custom playlist favorites, you can renew directly with renewal perks in your Client Portal:\nhttps://lunaentertainment.online/portal.html\n\nOr chat with our team on WhatsApp: https://wa.me/447882507089\n\nThank you for streaming with us,\nLuna Stream Team",
+    "variables": ["customer_name", "subscription_id", "end_date"]
+  },
+  "EXPIRY_REMINDER_3D": {
+    "subject": "Urgent: Only 3 Days Left on Your Luna Stream Pass",
+    "body_text": "Hello {{customer_name}},\n\nYour subscription {{subscription_id}} expires in 3 days on {{end_date}}.\n\nRenew now to avoid service interruption:\nhttps://lunaentertainment.online/checkout.html\n\nBest regards,\nLuna Stream Team",
+    "variables": ["customer_name", "subscription_id", "end_date"]
+  },
+  "EXPIRY_REMINDER_1D": {
+    "subject": "Final Notice: Your Luna Stream Subscription Expires Tomorrow",
+    "body_text": "Hello {{customer_name}},\n\nYour Luna Stream streaming line will be deactivated tomorrow ({{end_date}}).\n\nRenew today to maintain your streaming line:\nhttps://lunaentertainment.online/portal.html\n\nWarm regards,\nLuna Stream Team",
+    "variables": ["customer_name", "end_date"]
+  },
+  "PASSWORD_RESET": {
+    "subject": "Reset Your Luna Stream Account Password",
+    "body_text": "Hello {{customer_name}},\n\nWe received a request to reset your password for your Luna Stream Client Portal account.\n\nYour 6-Digit Password Reset Code is: {{reset_token}}\n\nThis code expires in 1 hour. If you did not request a password reset, you may safely ignore this email.\n\nReset Password Here:\nhttps://lunaentertainment.online/portal.html\n\nBest regards,\nLuna Stream Security Desk",
+    "variables": ["customer_name", "reset_token"]
+  }
+}
