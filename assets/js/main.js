@@ -12,6 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
   initCookieConsentBanner();
   initClipboardButtons();
   initSportsTicker();
+  (async function initDynamicSupportLinks() {
+    try {
+      const res = await fetch('/api/public/config');
+      if (!res.ok) return;
+      const cfg = await res.json();
+      const waDigits = String(cfg.support_whatsapp || '').replace(/[^0-9]/g, '');
+      if (!waDigits) return;
+      document.querySelectorAll('a[href*="wa.me/"]').forEach(link => {
+        link.href = link.href.replace(/wa\.me\/[0-9]+/, `wa.me/${waDigits}`);
+      });
+    } catch (e) {}
+  })();
 });
 
 /* -------------------------------------------------------------
@@ -162,6 +174,8 @@ function initTrialModal() {
       const emailInput = form.querySelector('input[type="email"]');
       const deviceSelect = form.querySelector('select[name="device"]');
       const email = emailInput ? emailInput.value.trim() : '';
+      const phoneInput = form.querySelector('input[name="phone"], input[type="tel"]');
+      const phone = phoneInput ? phoneInput.value.trim() : '';
       const device = deviceSelect ? deviceSelect.value : 'Smart TV';
 
       if (!email) {
@@ -184,7 +198,7 @@ function initTrialModal() {
         const trialRes = await fetch('/api/trials', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ customer_name: 'Trial Applicant', email: email, device_type: device, country: 'Global' })
+          body: JSON.stringify({ customer_name: 'Trial Applicant', email: email, phone: phone, device_type: device, country: 'Global' })
         });
         if (!trialRes.ok) throw new Error('Trial API failed');
 
@@ -232,6 +246,7 @@ function initContactForm() {
     e.preventDefault();
     const name = document.getElementById('contact_name')?.value.trim() || 'Valued Visitor';
     const email = document.getElementById('contact_email')?.value.trim() || '';
+    const phone = document.getElementById('contact_phone')?.value.trim() || '';
     const device = document.getElementById('contact_device')?.value || 'Amazon FireStick 4K';
     const country = document.getElementById('contact_country')?.value.trim() || 'Global';
     const message = document.getElementById('contact_message')?.value.trim() || '';
@@ -262,6 +277,7 @@ function initContactForm() {
         body: JSON.stringify({
           customer_name: name,
           email: email,
+          phone: phone,
           device_type: device,
           country: country,
           message: message

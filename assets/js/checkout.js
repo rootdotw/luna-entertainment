@@ -2,7 +2,7 @@
  * Luna Stream IPTV - Interactive Checkout & WhatsApp / Telegram Order Builder + Backend Integration
  */
 
-const SUPPORT_WHATSAPP_NUMBER = "447413469398";
+const SUPPORT_WHATSAPP_NUMBER = "447882507089";
 const SUPPORT_TELEGRAM_HANDLE = "LunaStreamOfficial";
 
 const CHECKOUT_PRICING = {
@@ -147,6 +147,7 @@ async function loadAppSettings() {
     if (res.ok) {
       const data = await res.json();
       appSettings = { ...appSettings, ...data };
+      updateOrderSummary();
     }
   } catch (e) {}
 
@@ -459,7 +460,8 @@ function updateOrderSummary() {
       `📱 My Device Type: ${checkoutState.deviceType}\n\n` +
       `Please provide payment details (Crypto, Card, or PayPal) and activation credentials. Thank you!`
     );
-    waBtn.href = `https://wa.me/${SUPPORT_WHATSAPP_NUMBER}?text=${waText}`;
+    const activeWa = String(appSettings?.support_whatsapp || SUPPORT_WHATSAPP_NUMBER).replace(/[^0-9]/g, '') || SUPPORT_WHATSAPP_NUMBER;
+    waBtn.href = `https://wa.me/${activeWa}?text=${waText}`;
   }
 
   const tgBtn = document.getElementById('btn_order_telegram');
@@ -1033,7 +1035,7 @@ window.showPayPalScreenshotView = function(orderId, email, name) {
   if (orderIdEl) orderIdEl.textContent = ordId || 'LUNA-ORDER';
   if (emailEl) emailEl.textContent = eml || 'your email';
 
-  const waNumber = (appSettings?.support_whatsapp || SUPPORT_WHATSAPP_NUMBER || '447413469398').replace(/[^0-9]/g, '');
+  const waNumber = (appSettings?.support_whatsapp || SUPPORT_WHATSAPP_NUMBER || '447882507089').replace(/[^0-9]/g, '');
   const pricing = calculateCurrentPricing();
   const waMsg = `Hello Luna Stream! I completed my PayPal payment for Order: ${ordId || 'NEW'} | Plan: ${pricing.planTitle} (${checkoutState.devices} Screen${checkoutState.devices > 1 ? 's' : ''}) | Amount: ${pricing.symbol}${pricing.total} ${checkoutState.currency} | Email: ${eml}. Here is my payment screenshot for instant activation:`;
   const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMsg)}`;
@@ -1221,7 +1223,7 @@ function showOrderSuccessModal(fullName, email, paymentMethod, orderId) {
   if (payEl) payEl.textContent = paymentMethod;
 
   const targetOrdId = orderId || window._currentPayPalOrderId || '';
-  const waNumber = (appSettings?.support_whatsapp || SUPPORT_WHATSAPP_NUMBER || '447413469398').replace(/[^0-9]/g, '');
+  const waNumber = (appSettings?.support_whatsapp || SUPPORT_WHATSAPP_NUMBER || '447882507089').replace(/[^0-9]/g, '');
 
   const isManualVerification = paymentMethod && (paymentMethod.includes('Verification') || paymentMethod.includes('Pending') || paymentMethod.includes('Manual'));
 

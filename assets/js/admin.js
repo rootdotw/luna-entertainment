@@ -812,7 +812,7 @@ function openDeliveryModal(orderId) {
 
   if (waBtn) {
     const encoded = encodeURIComponent(message);
-    const phone = o.customer_phone ? o.customer_phone.replace(/[^0-9]/g, '') : '447413469398';
+    const phone = o.customer_phone ? o.customer_phone.replace(/[^0-9]/g, '') : '447882507089';
     waBtn.href = `https://wa.me/${phone}?text=${encoded}`;
   }
 
@@ -1473,38 +1473,84 @@ function renderTrials() {
     const tdId = document.createElement('td');
     tdId.className = 'p-3.5 font-mono text-blue-400 font-bold';
     tdId.textContent = t.id || 'N/A';
+    const dDiv = document.createElement('div');
+    dDiv.className = 'text-[10px] text-slate-500 font-sans font-normal mt-0.5';
+    dDiv.textContent = t.created_at ? new Date(t.created_at).toLocaleString() : '';
+    tdId.appendChild(dDiv);
 
     const tdEmail = document.createElement('td');
-    tdEmail.className = 'p-3.5 font-bold text-white';
-    tdEmail.textContent = t.email || 'N/A';
+    tdEmail.className = 'p-3.5';
+    const nDiv = document.createElement('div');
+    nDiv.className = 'font-bold text-white';
+    nDiv.textContent = t.customer_name && t.customer_name !== 'Trial Applicant' && t.customer_name !== 'Free Trial Applicant' ? t.customer_name : (t.email || 'N/A');
+    const eDiv = document.createElement('div');
+    eDiv.className = 'text-[11px] text-slate-400';
+    eDiv.textContent = t.email || '';
+    tdEmail.append(nDiv, eDiv);
+    if (t.phone) {
+      const pDiv = document.createElement('div');
+      pDiv.className = 'text-[11px] text-emerald-400 font-mono';
+      pDiv.textContent = `📱 ${t.phone}`;
+      tdEmail.appendChild(pDiv);
+    }
 
     const tdDev = document.createElement('td');
     tdDev.className = 'p-3.5 text-xs text-slate-300';
-    tdDev.textContent = t.device || 'Smart TV';
+    tdDev.textContent = t.device_type || t.device || 'Smart TV';
 
     const tdNotes = document.createElement('td');
     tdNotes.className = 'p-3.5 text-xs text-slate-400 max-w-xs truncate';
-    tdNotes.textContent = t.notes || '—';
+    tdNotes.textContent = t.message || t.notes || '—';
+    if (t.xtream_username) {
+      const cDiv = document.createElement('div');
+      cDiv.className = 'text-[10px] font-mono text-slate-500 mt-0.5';
+      cDiv.textContent = `U: ${t.xtream_username}`;
+      tdNotes.appendChild(cDiv);
+    }
 
+    const st = t.status || 'Pending';
     const tdStatus = document.createElement('td');
     tdStatus.className = 'p-3.5';
     const sBadge = document.createElement('span');
-    sBadge.className = `px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${t.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}`;
-    sBadge.textContent = t.status || 'Pending';
+    const sColor = (st === 'Sent' || st === 'Approved') ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                   st === 'Rejected' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                   'bg-amber-500/20 text-amber-400 border border-amber-500/30';
+    sBadge.className = `px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${sColor}`;
+    sBadge.textContent = st;
     tdStatus.appendChild(sBadge);
+    if (t.sent_via) {
+      const vDiv = document.createElement('div');
+      vDiv.className = 'text-[10px] text-slate-500 mt-1';
+      vDiv.textContent = `via ${t.sent_via}`;
+      tdStatus.appendChild(vDiv);
+    }
 
     const tdAct = document.createElement('td');
-    tdAct.className = 'p-3.5 text-right';
-    if (t.status === 'Pending') {
-      const btnApprove = document.createElement('button');
-      btnApprove.className = 'btn-primary px-2.5 py-1 rounded text-xs font-bold text-white bg-blue-600 hover:bg-blue-500';
-      btnApprove.textContent = 'Approve';
-      btnApprove.onclick = () => updateTrialStatus(t.id, 'Approved');
-      tdAct.appendChild(btnApprove);
-    } else {
-      tdAct.textContent = 'Completed';
-      tdAct.className += ' text-slate-500 text-xs italic';
+    tdAct.className = 'p-3.5 text-right whitespace-nowrap space-x-1';
+
+    const btnSend = document.createElement('button');
+    const isPending = st === 'Pending';
+    btnSend.className = isPending
+      ? 'px-2.5 py-1 rounded text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 cursor-pointer'
+      : 'px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer';
+    btnSend.textContent = isPending ? '📤 Send Trial' : '↻ Resend / Edit';
+    btnSend.onclick = () => openTrialSendModal(t.id);
+    tdAct.appendChild(btnSend);
+
+    if (isPending) {
+      const btnReject = document.createElement('button');
+      btnReject.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-500/30 cursor-pointer';
+      btnReject.textContent = 'Reject';
+      btnReject.onclick = () => updateTrialStatus(t.id, 'Rejected');
+      tdAct.appendChild(btnReject);
     }
+
+    const btnDel = document.createElement('button');
+    btnDel.className = 'px-2 py-1 rounded text-xs font-semibold bg-slate-900 hover:bg-red-950/60 text-slate-400 hover:text-red-300 border border-slate-800 cursor-pointer';
+    btnDel.textContent = '🗑️';
+    btnDel.title = 'Delete Trial Request';
+    btnDel.onclick = () => deleteTrial(t.id);
+    tdAct.appendChild(btnDel);
 
     tr.append(tdId, tdEmail, tdDev, tdNotes, tdStatus, tdAct);
     tbody.appendChild(tr);
@@ -1519,13 +1565,349 @@ async function updateTrialStatus(trialId, newStatus) {
     });
     const data = await res.json();
     if (data.success) {
-      showToast(`Trial ${newStatus.toLowerCase()}!`, 'success');
+      showToast(`Trial marked as ${newStatus}.`, 'success');
       refreshAllData();
+    } else {
+      showToast(data.message || 'Failed to update trial.', 'error');
     }
   } catch (err) {
     showToast('Failed to update trial.', 'error');
   }
 }
+
+async function deleteTrial(trialId) {
+  if (!confirm('Delete this trial request?')) return;
+  try {
+    const res = await adminFetch(`/api/admin/trials?id=${encodeURIComponent(trialId)}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ id: trialId })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Trial request deleted.', 'info');
+      refreshAllData();
+    } else {
+      showToast('Failed to delete trial.', 'error');
+    }
+  } catch (err) {
+    showToast('Error deleting trial.', 'error');
+  }
+}
+
+/* ---------- Send Trial Modal & Trial Settings (Email + WhatsApp delivery) ---------- */
+let currentTrialSendId = null;
+const TRIAL_DEFAULT_SERVER = 'http://line.lunaentertainment.online:8080';
+
+function getDefaultTrialServer() {
+  if (appSettings && appSettings.trial_server_url) return appSettings.trial_server_url;
+  if (appSettings && appSettings.m3u_server_template) {
+    const m = String(appSettings.m3u_server_template).match(/https?:\/\/[^/]+/);
+    if (m) return m[0];
+  }
+  return TRIAL_DEFAULT_SERVER;
+}
+
+function trialRandom(len, chars) {
+  const arr = new Uint32Array(len);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, n => chars[n % chars.length]).join('');
+}
+
+function getTrialFormValues() {
+  const v = id => (document.getElementById(id)?.value || '').trim();
+  return {
+    name: v('trial-send-name'),
+    email: v('trial-send-email'),
+    phone: v('trial-send-phone'),
+    device: v('trial-send-device'),
+    server: v('trial-send-server') || getDefaultTrialServer(),
+    username: v('trial-send-username'),
+    password: v('trial-send-password'),
+    m3u: v('trial-send-m3u')
+  };
+}
+
+function buildTrialMessage() {
+  const f = getTrialFormValues();
+  const durLabel = (appSettings && appSettings.trial_duration_label) ? appSettings.trial_duration_label : '24-Hour';
+  const customNote = (appSettings && appSettings.trial_custom_note) ? String(appSettings.trial_custom_note).trim() : '';
+  const name = f.name && !/trial applicant/i.test(f.name) ? f.name : 'there';
+  return `✨ *LUNA STREAM — YOUR ${durLabel.toUpperCase()} FREE TRIAL IS READY* ✨\n\n` +
+    `Hello ${name},\n` +
+    `Your free ${durLabel} test line is now active. Here are your login details:\n\n` +
+    `📺 *Device:* ${f.device || 'Streaming Device'}\n` +
+    `🌐 *Server URL:* ${f.server}\n` +
+    `👤 *Username:* ${f.username || '—'}\n` +
+    `🔑 *Password:* ${f.password || '—'}\n\n` +
+    (f.m3u ? `🔗 *M3U Playlist:*\n${f.m3u}\n\n` : '') +
+    (customNote ? `💡 *Quick Note:* ${customNote}\n\n` : '') +
+    `📱 *Setup guide:* https://lunaentertainment.online/setup.html\n` +
+    `💎 *Like it? Upgrade here:* https://lunaentertainment.online/pricing.html\n\n` +
+    `Reply to this message if you need any help. Enjoy! ⚽🍿`;
+}
+
+function syncTrialDeliveryLinks() {
+  const f = getTrialFormValues();
+  const preview = document.getElementById('trial-send-preview');
+  const msg = preview ? preview.value : buildTrialMessage();
+  const durLabel = (appSettings && appSettings.trial_duration_label) ? appSettings.trial_duration_label : '24-Hour';
+  const subject = `Your ${durLabel} Free Trial is Ready - Luna Stream`;
+  const plainBody = msg.replace(/\*/g, '');
+
+  const waBtn = document.getElementById('btn-trial-send-whatsapp');
+  if (waBtn) {
+    const phone = (f.phone || '').replace(/[^0-9]/g, '');
+    waBtn.href = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    const lbl = document.getElementById('trial-send-wa-label');
+    if (lbl) lbl.textContent = phone ? `WhatsApp (+${phone})` : 'Send via WhatsApp';
+  }
+
+  const gmailBtn = document.getElementById('btn-trial-send-gmail');
+  if (gmailBtn) {
+    gmailBtn.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(f.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainBody)}`;
+  }
+
+  const mailBtn = document.getElementById('btn-trial-send-mailto');
+  if (mailBtn) {
+    mailBtn.href = `mailto:${encodeURIComponent(f.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainBody)}`;
+  }
+}
+
+function refreshTrialPreview() {
+  const f = getTrialFormValues();
+  const m3uEl = document.getElementById('trial-send-m3u');
+  if (m3uEl && m3uEl.dataset.auto !== 'false' && f.username && f.password) {
+    m3uEl.value = `${f.server.replace(/\/+$/, '')}/get.php?username=${encodeURIComponent(f.username)}&password=${encodeURIComponent(f.password)}&type=m3u_plus&output=ts`;
+  }
+  const msg = buildTrialMessage();
+  const preview = document.getElementById('trial-send-preview');
+  if (preview) preview.value = msg;
+  syncTrialDeliveryLinks();
+}
+
+function openTrialSendModal(trialId) {
+  const t = allTrials.find(x => x.id === trialId);
+  if (!t) return;
+  currentTrialSendId = trialId;
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+
+  setVal('trial-send-name', t.customer_name);
+  setVal('trial-send-email', t.email);
+  setVal('trial-send-phone', t.phone);
+  setVal('trial-send-device', t.device_type || t.device);
+  setVal('trial-send-server', t.server_url || getDefaultTrialServer());
+  setVal('trial-send-username', t.xtream_username || '');
+  setVal('trial-send-password', t.xtream_password || '');
+  const m3uEl = document.getElementById('trial-send-m3u');
+  if (m3uEl) { m3uEl.value = t.m3u_url || ''; m3uEl.dataset.auto = t.m3u_url ? 'false' : 'true'; }
+
+  const title = document.getElementById('trial-send-title');
+  if (title) title.textContent = `Send Free Trial — ${t.id}`;
+  const req = document.getElementById('trial-send-request');
+  if (req) req.textContent = t.message ? `Customer note: "${t.message}"` : 'Enter or generate trial credentials below, then send via WhatsApp or Email.';
+
+  refreshTrialPreview();
+  document.getElementById('trial-send-modal')?.classList.remove('hidden');
+}
+
+function closeTrialSendModal() {
+  document.getElementById('trial-send-modal')?.classList.add('hidden');
+  currentTrialSendId = null;
+}
+
+function generateTrialCredentials() {
+  const lower = 'abcdefghijkmnpqrstuvwxyz23456789';
+  const mixed = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  document.getElementById('trial-send-username').value = 'trial' + trialRandom(5, lower);
+  document.getElementById('trial-send-password').value = trialRandom(10, mixed);
+  const m3uEl = document.getElementById('trial-send-m3u');
+  if (m3uEl) m3uEl.dataset.auto = 'true';
+  refreshTrialPreview();
+}
+
+async function provisionTrialFromPanel() {
+  const f = getTrialFormValues();
+  try {
+    showToast('Provisioning trial line...', 'info');
+    const res = await adminFetch('/api/admin/subscriptions/provision-panel', {
+      method: 'POST',
+      body: JSON.stringify({
+        plan_id: 'trial',
+        devices_count: 1,
+        customer_email: f.email
+      })
+    });
+    const data = await res.json();
+    if (data && data.xtream_username) {
+      document.getElementById('trial-send-username').value = data.xtream_username;
+      document.getElementById('trial-send-password').value = data.xtream_password || '';
+      if (data.m3u_url) {
+        const m3uEl = document.getElementById('trial-send-m3u');
+        if (m3uEl) { m3uEl.value = data.m3u_url; m3uEl.dataset.auto = 'false'; }
+      }
+      refreshTrialPreview();
+      showToast(`Line ready: ${data.xtream_username} (${data.mode || 'generated'})`, 'success');
+    } else {
+      showToast('Could not provision from panel — generated local test credentials instead.', 'error');
+      generateTrialCredentials();
+    }
+  } catch (err) {
+    generateTrialCredentials();
+  }
+}
+
+async function saveTrialDelivery({ sendEmail = false, sentVia = '', requireCreds = true } = {}) {
+  if (!currentTrialSendId) return null;
+  const f = getTrialFormValues();
+  if (requireCreds && (!f.username || !f.password)) {
+    showToast('Enter the trial username & password first (or click Auto-Generate).', 'error');
+    return null;
+  }
+  try {
+    const res = await adminFetch('/api/admin/trials', {
+      method: 'PATCH',
+      body: JSON.stringify({
+        id: currentTrialSendId,
+        status: 'Sent',
+        customer_name: f.name,
+        phone: f.phone,
+        server_url: f.server,
+        xtream_username: f.username,
+        xtream_password: f.password,
+        m3u_url: f.m3u,
+        send_email: sendEmail,
+        sent_via: sentVia
+      })
+    });
+    const data = await res.json();
+    if (!data.success) {
+      showToast(data.message || 'Failed to save trial.', 'error');
+      return null;
+    }
+    return data;
+  } catch (err) {
+    showToast('Error saving trial.', 'error');
+    return null;
+  }
+}
+
+async function saveTrialOnly() {
+  const data = await saveTrialDelivery({ sentVia: 'Manual' });
+  if (data) {
+    showToast('Trial credentials saved & marked Sent!', 'success');
+    closeTrialSendModal();
+    refreshAllData();
+  }
+}
+
+async function sendTrialByServerEmail() {
+  const f = getTrialFormValues();
+  if (!f.email) { showToast('This trial has no email address.', 'error'); return; }
+  const data = await saveTrialDelivery({ sendEmail: true, sentVia: 'Server Email' });
+  if (!data) return;
+  const st = String(data.email_status || '');
+  if (st === 'SENT') {
+    showToast(`✅ Trial emailed directly to ${f.email}`, 'success');
+    closeTrialSendModal();
+  } else if (st === 'LOGGED_ONLY') {
+    showToast('SMTP is currently OFF in Settings — click "Send via Gmail" or "Email App" instead!', 'error');
+  } else {
+    showToast(`Server email failed (${st}) — use "Send via Gmail" or WhatsApp instead.`, 'error');
+  }
+  refreshAllData();
+}
+
+function handleTrialChannelClick(e, channelName) {
+  const f = getTrialFormValues();
+  if (!f.username || !f.password) {
+    e.preventDefault();
+    showToast('Please enter or click "Auto-Generate" for Username & Password before sending!', 'error');
+    return;
+  }
+  syncTrialDeliveryLinks();
+  saveTrialDelivery({ sentVia: channelName }).then(data => {
+    if (data) {
+      showToast(`Trial marked as Sent via ${channelName}!`, 'success');
+      refreshAllData();
+    }
+  });
+}
+
+function copyTrialMessage() {
+  const msg = document.getElementById('trial-send-preview')?.value || '';
+  navigator.clipboard.writeText(msg).then(() => showToast('Trial message copied to clipboard!', 'success'));
+}
+
+/* ---------- Trial Delivery Settings Modal ---------- */
+function openTrialSettingsModal() {
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  setVal('cfg-trial-server-url', getDefaultTrialServer());
+  setVal('cfg-trial-duration', (appSettings && appSettings.trial_duration_label) || '24-Hour');
+  setVal('cfg-trial-custom-note', (appSettings && appSettings.trial_custom_note) || '');
+  setVal('cfg-trial-support-wa', (appSettings && appSettings.support_whatsapp) || '447882507089');
+  document.getElementById('trial-settings-modal')?.classList.remove('hidden');
+}
+
+function closeTrialSettingsModal() {
+  document.getElementById('trial-settings-modal')?.classList.add('hidden');
+}
+
+async function saveTrialSettings(e) {
+  if (e) e.preventDefault();
+  const serverUrl = (document.getElementById('cfg-trial-server-url')?.value || '').trim().replace(/\/+$/, '') || TRIAL_DEFAULT_SERVER;
+  const durationLabel = (document.getElementById('cfg-trial-duration')?.value || '').trim() || '24-Hour';
+  const customNote = (document.getElementById('cfg-trial-custom-note')?.value || '').trim();
+  const supportWa = (document.getElementById('cfg-trial-support-wa')?.value || '').trim().replace(/[^0-9]/g, '');
+  const updateGlobalM3u = document.getElementById('cfg-trial-sync-m3u')?.checked;
+
+  const payload = {
+    trial_server_url: serverUrl,
+    trial_duration_label: durationLabel,
+    trial_custom_note: customNote
+  };
+  if (supportWa) payload.support_whatsapp = supportWa;
+  if (updateGlobalM3u) {
+    payload.m3u_server_template = `${serverUrl}/get.php?username={username}&password={password}&type=m3u_plus&output=ts`;
+  }
+
+  try {
+    const res = await adminFetch('/api/admin/settings', {
+      method: 'PATCH',
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) {
+      appSettings = Object.assign({}, appSettings || {}, payload);
+      showToast('Trial delivery settings saved!', 'success');
+      closeTrialSettingsModal();
+      if (currentTrialSendId) {
+        const srvInput = document.getElementById('trial-send-server');
+        if (srvInput) srvInput.value = serverUrl;
+        refreshTrialPreview();
+      }
+    } else {
+      showToast(data.message || 'Failed to save trial settings.', 'error');
+    }
+  } catch (err) {
+    showToast('Error saving trial settings.', 'error');
+  }
+}
+
+window.openTrialSendModal = openTrialSendModal;
+window.closeTrialSendModal = closeTrialSendModal;
+window.generateTrialCredentials = generateTrialCredentials;
+window.provisionTrialFromPanel = provisionTrialFromPanel;
+window.refreshTrialPreview = refreshTrialPreview;
+window.syncTrialDeliveryLinks = syncTrialDeliveryLinks;
+window.sendTrialByServerEmail = sendTrialByServerEmail;
+window.handleTrialChannelClick = handleTrialChannelClick;
+window.saveTrialOnly = saveTrialOnly;
+window.copyTrialMessage = copyTrialMessage;
+window.updateTrialStatus = updateTrialStatus;
+window.deleteTrial = deleteTrial;
+window.openTrialSettingsModal = openTrialSettingsModal;
+window.closeTrialSettingsModal = closeTrialSettingsModal;
+window.saveTrialSettings = saveTrialSettings;
 
 /* ==========================================================================
    10b. SUPPORT TICKETS CONTROLLER
@@ -1793,7 +2175,7 @@ function renderLeads() {
     link.className = 'text-xs text-emerald-400 font-bold hover:underline';
     link.textContent = 'WhatsApp →';
     link.target = '_blank';
-    link.href = `https://wa.me/447413469398?text=${encodeURIComponent(`Hi, following up on your Luna Stream enquiry!`)}`;
+    link.href = `https://wa.me/447882507089?text=${encodeURIComponent(`Hi, following up on your Luna Stream enquiry!`)}`;
     tdAct.appendChild(link);
 
     tr.append(tdId, tdEvent, tdCust, tdPkg, tdTime, tdAct);
