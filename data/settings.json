@@ -1,5 +1,5 @@
 {
-    "admin_password":  "admin",
+    "admin_password":  "U5edk6apW7rh8Bk/B2sXug==:Zh78rmqcVWNUDd9XaznJ5KoR5MqwbiHHtWjkHp0JFJU=",
     "auth_token":  "ps_sec_token_99281a8b",
     "brand_name":  "Luna Stream IPTV",
     "m3u_server_template":  "http://line.lunaentertainment.online:8080/get.php?username={username}\u0026password={password}\u0026type=m3u_plus\u0026output=ts",
@@ -43,4 +43,5 @@
     "iptv_panel_auto_fulfill_orders":  true,
     "iptv_panel_auto_fulfill_trials":  true,
     "password_changed_runtime":  true
+    
 }
