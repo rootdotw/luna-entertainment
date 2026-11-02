@@ -218,7 +218,7 @@ function Initialize-DefaultData() {
             brand_name = "Luna Stream IPTV"
             m3u_server_template = "http://line.lunaentertainment.online:8080/get.php?username={username}&password={password}&type=m3u_plus&output=ts"
             xtream_server_url = "http://line.lunaentertainment.online:8080"
-            support_whatsapp = "447413469398"
+            support_whatsapp = "447882507089"
             support_telegram = "LunaStreamOfficial"
             paypal_email = "wasifali740@gmail.com"
             paypal_me_link = "https://paypal.me/SheerazAli806"
@@ -574,6 +574,96 @@ function Set-ObjectProperty($obj, [string]$propName, $val) {
     }
 }
 
+function Invoke-ResendEmailApi([string]$apiKey, [string]$fromHeader, [string]$toEmail, [string]$subject, [string]$bodyText) {
+    Add-Type -AssemblyName System.Net.Http -ErrorAction SilentlyContinue
+    $client = New-Object System.Net.Http.HttpClient
+    try {
+        $client.Timeout = [TimeSpan]::FromSeconds(15)
+        $client.DefaultRequestHeaders.Authorization = New-Object System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", $apiKey.Trim())
+        $payloadObj = @{
+            from    = $fromHeader
+            to      = @($toEmail.Trim())
+            subject = $subject
+            text    = $bodyText
+        }
+        $jsonBody = $payloadObj | ConvertTo-Json -Depth 5 -Compress
+        $content = New-Object System.Net.Http.StringContent($jsonBody, [System.Text.Encoding]::UTF8, "application/json")
+        $resp = $client.PostAsync("https://api.resend.com/emails", $content).GetAwaiter().GetResult()
+        $respText = $resp.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+        $statusCode = [int]$resp.StatusCode
+        return @{ success = [bool]$resp.IsSuccessStatusCode; status_code = $statusCode; body = $respText; used_from = $fromHeader }
+    } finally {
+        $client.Dispose()
+    }
+}
+
+function Invoke-LiveEmailSend([string]$toEmail, [string]$subject, [string]$bodyText, $settings) {
+    if (-not $settings) { $settings = Read-JsonFileSafe "settings.json" @{} }
+    $envKey = if ($env:RESEND_API_KEY) { [string]$env:RESEND_API_KEY.Trim() } elseif ($env:SMTP_PASS) { [string]$env:SMTP_PASS.Trim() } else { "" }
+    $cfgPass = if ($settings.smtp_pass) { [string]$settings.smtp_pass.Trim() } else { "" }
+    if ($cfgPass -eq "re_sample_secret_key_999") { $cfgPass = "" }
+
+    $activeKey = if ($envKey) { $envKey } else { $cfgPass }
+    $isEnabled = ($settings.smtp_enabled -eq $true) -or ($envKey -ne "")
+    if (-not $isEnabled) {
+        return @{ success = $false; status = "LOGGED_ONLY"; message = "Automated email (Resend / SMTP) is disabled in Settings." }
+    }
+
+    $rawFrom = if ($env:SMTP_FROM) { [string]$env:SMTP_FROM.Trim() } elseif ($settings.smtp_from) { [string]$settings.smtp_from.Trim() } else { "support@lunaentertainment.online" }
+    $brandName = if ($settings.brand_name) { [string]$settings.brand_name.Trim() } else { "Luna Stream" }
+    $formattedFrom = if ($rawFrom.Contains("<")) { $rawFrom } else { "$brandName <$rawFrom>" }
+
+    $isResend = ($activeKey.StartsWith("re_")) -or ([string]$settings.smtp_server -match "resend\.com")
+    if ($isResend) {
+        if (-not $activeKey -or -not $activeKey.StartsWith("re_")) {
+            return @{ success = $false; status = "FAILED: Missing Resend API key"; message = "Enter your Resend API key (re_...) in Settings -> Auto-Email (SMTP) or set RESEND_API_KEY in Render Environment Variables." }
+        }
+        $res = Invoke-ResendEmailApi $activeKey $formattedFrom $toEmail $subject $bodyText
+        if (-not $res.success -and $res.body -match "not verified" -and $rawFrom -ne "onboarding@resend.dev") {
+            $fallbackRes = Invoke-ResendEmailApi $activeKey "$brandName <onboarding@resend.dev>" $toEmail $subject $bodyText
+            if ($fallbackRes.success) {
+                return @{
+                    success = $true
+                    status = "SENT"
+                    provider = "Resend HTTPS API (sent via onboarding@resend.dev; verify lunaentertainment.online at resend.com/domains to email external customers)"
+                }
+            }
+            return @{
+                success = $false
+                status = "FAILED: Domain not verified in Resend yet"
+                message = "Your Resend API key is valid, but 'lunaentertainment.online' is not verified in Resend yet. Go to resend.com/domains and verify lunaentertainment.online so you can email any customer (until verified, Resend only sends test emails to your own Resend account email)."
+            }
+        }
+        if ($res.success) {
+            return @{ success = $true; status = "SENT"; provider = "Resend HTTPS API" }
+        } else {
+            $errMsg = $res.body
+            try {
+                $parsedErr = $res.body | ConvertFrom-Json
+                if ($parsedErr.message) { $errMsg = [string]$parsedErr.message }
+            } catch {}
+            return @{ success = $false; status = "FAILED: $errMsg"; message = "Resend API Error ($($res.status_code)): $errMsg" }
+        }
+    }
+
+    if (-not $settings.smtp_server) {
+        return @{ success = $false; status = "FAILED: No SMTP server configured"; message = "No SMTP server configured." }
+    }
+    try {
+        $portNum = if ($settings.smtp_port) { [int]$settings.smtp_port } else { 587 }
+        $smtpClient = New-Object System.Net.Mail.SmtpClient([string]$settings.smtp_server, $portNum)
+        if ($settings.smtp_user -and $activeKey) {
+            $smtpClient.Credentials = New-Object System.Net.NetworkCredential([string]$settings.smtp_user, $activeKey)
+        }
+        $smtpClient.EnableSsl = if ($null -ne $settings.smtp_ssl) { [bool]$settings.smtp_ssl } else { $true }
+        $mailMsg = New-Object System.Net.Mail.MailMessage($rawFrom, $toEmail, $subject, $bodyText)
+        $smtpClient.Send($mailMsg)
+        return @{ success = $true; status = "SENT"; provider = "SMTP" }
+    } catch {
+        return @{ success = $false; status = "FAILED: $($_.Exception.Message)"; message = "SMTP Connection Failed: $($_.Exception.Message)" }
+    }
+}
+
 function Send-EmailNotification([string]$templateKey, [string]$toEmail, [hashtable]$variables) {
     try {
         $templates = Read-JsonFileSafe "email_templates.json" @{}
@@ -593,24 +683,8 @@ function Send-EmailNotification([string]$templateKey, [string]$toEmail, [hashtab
 
         $settings = Read-JsonFileSafe "settings.json" @{}
         $emlId = New-SecureId "EML-" 6
-        $sentStatus = "LOGGED_ONLY"
-
-        if ($settings.smtp_enabled -eq $true -and $settings.smtp_server) {
-            try {
-                $portNum = if ($settings.smtp_port) { [int]$settings.smtp_port } else { 587 }
-                $smtpClient = New-Object System.Net.Mail.SmtpClient([string]$settings.smtp_server, $portNum)
-                if ($settings.smtp_user -and $settings.smtp_pass) {
-                    $smtpClient.Credentials = New-Object System.Net.NetworkCredential([string]$settings.smtp_user, [string]$settings.smtp_pass)
-                }
-                $smtpClient.EnableSsl = if ($null -ne $settings.smtp_ssl) { [bool]$settings.smtp_ssl } else { $true }
-                $fromAddr = if ($settings.smtp_from) { [string]$settings.smtp_from } else { "support@lunastream.vip" }
-                $mailMsg = New-Object System.Net.Mail.MailMessage($fromAddr, $toEmail, $subject, $body)
-                $smtpClient.Send($mailMsg)
-                $sentStatus = "SENT"
-            } catch {
-                $sentStatus = "FAILED: $($_.Exception.Message)"
-            }
-        }
+        $sendRes = Invoke-LiveEmailSend $toEmail $subject $body $settings
+        $sentStatus = [string]$sendRes.status
 
         # Log dispatch to email_log.json
         $log = [System.Collections.ArrayList]@(Read-JsonFileSafe "email_log.json" @())
@@ -1110,7 +1184,7 @@ try {
                         if (-not $settings.admin_password -or -not ([string]$settings.admin_password).Contains(':')) {
                             Set-ObjectProperty $settings 'admin_password' (Get-PasswordHash $providedPass)
                             if (-not $settings.brand_name) { Set-ObjectProperty $settings 'brand_name' "Luna Stream IPTV" }
-                            if (-not $settings.support_whatsapp) { Set-ObjectProperty $settings 'support_whatsapp' "447413469398" }
+                            if (-not $settings.support_whatsapp) { Set-ObjectProperty $settings 'support_whatsapp' "447882507089" }
                             if (-not $settings.support_telegram) { Set-ObjectProperty $settings 'support_telegram' "LunaStreamOfficial" }
                             if (-not $settings.paypal_me_link) { Set-ObjectProperty $settings 'paypal_me_link' "https://paypal.me/SheerazAli806" }
                             if (-not $settings.paypal_mode) { Set-ObjectProperty $settings 'paypal_mode' "paypal_me" }
@@ -1564,35 +1638,69 @@ try {
                     } elseif ($method -eq "PATCH") {
                         $targetId = $bodyJson.id
                         $targetTrial = $null
+                        $nowIso = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
                         for ($i = 0; $i -lt $trials.Count; $i++) {
                             if ($trials[$i].id -eq $targetId) {
                                 if ($null -ne $bodyJson.status) { Set-ObjectProperty $trials[$i] 'status' ([string]$bodyJson.status) }
                                 if ($null -ne $bodyJson.test_line_credentials) { Set-ObjectProperty $trials[$i] 'test_line_credentials' ([string]$bodyJson.test_line_credentials) }
+                                if ($null -ne $bodyJson.xtream_username) { Set-ObjectProperty $trials[$i] 'xtream_username' ([string]$bodyJson.xtream_username) }
+                                if ($null -ne $bodyJson.xtream_password) { Set-ObjectProperty $trials[$i] 'xtream_password' ([string]$bodyJson.xtream_password) }
+                                if ($null -ne $bodyJson.server_url) { Set-ObjectProperty $trials[$i] 'server_url' ([string]$bodyJson.server_url) }
+                                if ($null -ne $bodyJson.m3u_url) { Set-ObjectProperty $trials[$i] 'm3u_url' ([string]$bodyJson.m3u_url) }
+                                if ($null -ne $bodyJson.phone) { Set-ObjectProperty $trials[$i] 'phone' ([string]$bodyJson.phone) }
+                                if ($bodyJson.customer_name) { Set-ObjectProperty $trials[$i] 'customer_name' ([string]$bodyJson.customer_name) }
+                                if ($null -ne $bodyJson.admin_note) { Set-ObjectProperty $trials[$i] 'admin_note' ([string]$bodyJson.admin_note) }
+                                if ($bodyJson.sent_via) { Set-ObjectProperty $trials[$i] 'sent_via' ([string]$bodyJson.sent_via) }
+                                if ($bodyJson.status -eq "Sent" -or $bodyJson.status -eq "Approved") {
+                                    Set-ObjectProperty $trials[$i] 'sent_at' $nowIso
+                                }
+                                Set-ObjectProperty $trials[$i] 'updated_at' $nowIso
                                 $targetTrial = $trials[$i]
                                 break
                             }
                         }
-                        Write-JsonFileSafe "trials.json" $trials
 
-                        # Trigger Automated Trial Dispatched Email
-                        if ($targetTrial -and ($bodyJson.status -eq "Dispatched" -or $bodyJson.status -eq "Active" -or $bodyJson.test_line_credentials)) {
-                            if ($targetTrial.email) {
-                                $settings = Read-JsonFileSafe "settings.json" @{}
-                                $srvUrl = if ($settings.m3u_server_template -match 'https?://[^/]+') { $matches[0] } else { "http://line.lunastream.vip:8080" }
-                                $uName = if ($targetTrial.xtream_username) { $targetTrial.xtream_username } else { "trial_" + (New-SecureId "" 4) }
-                                $uPass = if ($targetTrial.xtream_password) { $targetTrial.xtream_password } else { (New-SecurePassword 8) }
-                                $m3u = Get-M3UUrl $uName $uPass
-                                Send-EmailNotification "TRIAL_DISPATCHED" $targetTrial.email @{
-                                    customer_name = $targetTrial.name
-                                    device_type = if ($targetTrial.device) { $targetTrial.device } else { "Streaming Device" }
-                                    server_url = $srvUrl
-                                    xtream_username = $uName
-                                    xtream_password = $uPass
-                                    m3u_url = $m3u
-                                } | Out-Null
-                            }
+                        if (-not $targetTrial) {
+                            Send-JsonResponse $response 404 @{ success = $false; message = "Trial not found" }
+                            continue
                         }
 
+                        # Optional: send trial credentials by server email (only when admin explicitly asks)
+                        $emailStatus = "NOT_REQUESTED"
+                        if ($bodyJson.send_email -eq $true) {
+                            if ($targetTrial.email) {
+                                try {
+                                    $settings = Read-JsonFileSafe "settings.json" @{}
+                                    $srvUrl = if ($targetTrial.server_url) { [string]$targetTrial.server_url } elseif ($settings.m3u_server_template -match 'https?://[^/]+') { $matches[0] } else { "http://line.lunaentertainment.online:8080" }
+                                    $uName = [string]$targetTrial.xtream_username
+                                    $uPass = [string]$targetTrial.xtream_password
+                                    $m3u = if ($targetTrial.m3u_url) { [string]$targetTrial.m3u_url } else { Get-M3UUrl $uName $uPass }
+                                    $mailRes = Send-EmailNotification "TRIAL_DISPATCHED" ([string]$targetTrial.email) @{
+                                        customer_name = if ($targetTrial.customer_name) { $targetTrial.customer_name } else { "there" }
+                                        device_type = if ($targetTrial.device_type) { $targetTrial.device_type } else { "Streaming Device" }
+                                        server_url = $srvUrl
+                                        xtream_username = $uName
+                                        xtream_password = $uPass
+                                        m3u_url = $m3u
+                                    }
+                                    $emailStatus = if ($mailRes.success) { [string]$mailRes.status } else { "FAILED: $($mailRes.message)" }
+                                } catch {
+                                    $emailStatus = "FAILED: $($_.Exception.Message)"
+                                }
+                            } else {
+                                $emailStatus = "NO_EMAIL"
+                            }
+                            Set-ObjectProperty $targetTrial 'email_status' $emailStatus
+                        }
+
+                        Write-JsonFileSafe "trials.json" $trials
+                        Add-AuditLog "TRIAL_UPDATED" "Admin" "Trial $targetId updated (status: $($targetTrial.status), email: $emailStatus)"
+                        Send-JsonResponse $response 200 @{ success = $true; trial = $targetTrial; email_status = $emailStatus }
+                    } elseif ($method -eq "DELETE") {
+                        $targetId = if ($bodyJson -and $bodyJson.id) { [string]$bodyJson.id } else { [string]$queryParams["id"] }
+                        $filtered = @($trials | Where-Object { $_.id -ne $targetId })
+                        Write-JsonFileSafe "trials.json" $filtered
+                        Add-AuditLog "TRIAL_DELETED" "Admin" "Deleted trial $targetId"
                         Send-JsonResponse $response 200 @{ success = $true }
                     }
                 }
@@ -1644,7 +1752,10 @@ try {
                                 $safeSettings[$p.Name] = $p.Value
                             }
                         }
-                        $safeSettings['has_smtp_pass'] = ($null -ne $settings.smtp_pass -and [string]$settings.smtp_pass.Trim() -ne "")
+                        $hasEnvResend = ($null -ne $env:RESEND_API_KEY -and [string]$env:RESEND_API_KEY.Trim() -ne "") -or ($null -ne $env:SMTP_PASS -and [string]$env:SMTP_PASS.Trim() -ne "")
+                        $hasSavedPass = ($null -ne $settings.smtp_pass -and [string]$settings.smtp_pass.Trim() -ne "" -and [string]$settings.smtp_pass.Trim() -ne "re_sample_secret_key_999")
+                        $safeSettings['has_smtp_pass'] = ($hasEnvResend -or $hasSavedPass)
+                        if ($hasEnvResend) { $safeSettings['smtp_enabled'] = $true }
                         $safeSettings['has_iptv_panel_pass'] = ($null -ne $settings.iptv_panel_password -and [string]$settings.iptv_panel_password.Trim() -ne "")
                         Send-JsonResponse $response 200 $safeSettings
                     } elseif ($method -eq "PATCH") {
@@ -1717,49 +1828,38 @@ try {
                         if ($null -ne $bodyJson.iptv_panel_package_trial) { Set-ObjectProperty $settings 'iptv_panel_package_trial' ([string]$bodyJson.iptv_panel_package_trial) }
                         if ($null -ne $bodyJson.iptv_panel_auto_fulfill_orders) { Set-ObjectProperty $settings 'iptv_panel_auto_fulfill_orders' ([bool]$bodyJson.iptv_panel_auto_fulfill_orders) }
                         if ($null -ne $bodyJson.iptv_panel_auto_fulfill_trials) { Set-ObjectProperty $settings 'iptv_panel_auto_fulfill_trials' ([bool]$bodyJson.iptv_panel_auto_fulfill_trials) }
+                        if ($null -ne $bodyJson.trial_server_url) { Set-ObjectProperty $settings 'trial_server_url' ([string]$bodyJson.trial_server_url) }
+                        if ($null -ne $bodyJson.trial_duration_label) { Set-ObjectProperty $settings 'trial_duration_label' ([string]$bodyJson.trial_duration_label) }
+                        if ($null -ne $bodyJson.trial_custom_note) { Set-ObjectProperty $settings 'trial_custom_note' ([string]$bodyJson.trial_custom_note) }
+                        if ($null -ne $bodyJson.support_whatsapp) { Set-ObjectProperty $settings 'support_whatsapp' ([string]$bodyJson.support_whatsapp) }
+                        if ($null -ne $bodyJson.m3u_server_template) { Set-ObjectProperty $settings 'm3u_server_template' ([string]$bodyJson.m3u_server_template) }
                         Write-JsonFileSafe "settings.json" $settings
                         Add-AuditLog "SETTINGS_UPDATE" "Admin" "Settings updated"
                         Send-JsonResponse $response 200 @{ success = $true }
                     }
                 }
-                                # Admin: Test SMTP Connection & Send Test Email
+                # Admin: Test SMTP / Resend Connection & Send Test Email
                 elseif ($apiRoute -eq "admin/test-email" -and $method -eq "POST") {
                     if (-not (Test-AdminAuth $request)) { Send-JsonResponse $response 401 @{ success = $false; message = 'Authentication required' }; continue }
                     $settings = Read-JsonFileSafe "settings.json" @{}
                     $toEmail = if ($bodyJson.to_email) { [string]$bodyJson.to_email } else { $settings.smtp_from }
-                    if (-not $toEmail) { $toEmail = "support@lunastream.vip" }
+                    if (-not $toEmail) { $toEmail = "support@lunaentertainment.online" }
 
-                    if (-not $settings.smtp_enabled -or -not $settings.smtp_server) {
-                        Send-JsonResponse $response 400 @{
-                            success = $false
-                            message = "SMTP is currently disabled or SMTP server is not configured in Settings."
-                        }
-                        continue
-                    }
+                    $testSubj = 'Luna Stream IPTV - Live Email Delivery Test Passed'
+                    $testBody = "Hello Admin,`n`nThis is a diagnostic test email confirming that your Resend / Email integration for Luna Stream IPTV is working live!`n`nTimestamp: $((Get-Date).ToString('yyyy-MM-dd HH:mm:ss'))`nSender: $($settings.smtp_from)`n`nAll automated customer notifications (24H Trials, Order Confirmations, Line Credentials, and Ticket Replies) are active.`n`nWarm regards,`nLuna Stream System"
 
-                    try {
-                        $portNum = if ($settings.smtp_port) { [int]$settings.smtp_port } else { 587 }
-                        $smtpClient = New-Object System.Net.Mail.SmtpClient([string]$settings.smtp_server, $portNum)
-                        if ($settings.smtp_user -and $settings.smtp_pass) {
-                            $smtpClient.Credentials = New-Object System.Net.NetworkCredential([string]$settings.smtp_user, [string]$settings.smtp_pass)
-                        }
-                        $smtpClient.EnableSsl = if ($null -ne $settings.smtp_ssl) { [bool]$settings.smtp_ssl } else { $true }
-                        $fromAddr = if ($settings.smtp_from) { [string]$settings.smtp_from } else { "support@lunastream.vip" }
-                        $testSubj = 'Luna Stream IPTV - SMTP Diagnostic Test Passed'
-                        $testBody = "Hello Admin,`n`nThis is a diagnostic test email confirming that your SMTP server connection and TLS handshake for Luna Stream IPTV are working successfully!`n`nTimestamp: $((Get-Date).ToString('yyyy-MM-dd HH:mm:ss'))`nSMTP Server: $($settings.smtp_server)`nPort: $portNum`nSender: $fromAddr`n`nAll automated customer notifications are active and delivering live.`n`nWarm regards,`nLuna Stream Engineering"
-                        $mailMsg = New-Object System.Net.Mail.MailMessage($fromAddr, $toEmail, $testSubj, $testBody)
-                        $smtpClient.Send($mailMsg)
-                        Add-AuditLog "SMTP_TEST_SENT" "Admin" "Sent test email to $($toEmail)"
+                    $sendRes = Invoke-LiveEmailSend $toEmail $testSubj $testBody $settings
+                    if ($sendRes.success) {
+                        Add-AuditLog "SMTP_TEST_SENT" "Admin" "Sent test email to $($toEmail) via $($sendRes.provider)"
                         Send-JsonResponse $response 200 @{
                             success = $true
-                            message = "Test email successfully dispatched to $($toEmail)"
+                            message = "Test email successfully sent to $($toEmail) via $($sendRes.provider)!"
                         }
-                    } catch {
-                        $errEx = $_.Exception.Message
-                        Add-AuditLog "SMTP_TEST_FAILED" "Admin" "Failed test email to $($toEmail) - $errEx"
-                        Send-JsonResponse $response 500 @{
+                    } else {
+                        Add-AuditLog "SMTP_TEST_FAILED" "Admin" "Failed test email to $($toEmail) - $($sendRes.message)"
+                        Send-JsonResponse $response 400 @{
                             success = $false
-                            message = "SMTP Connection Failed: $errEx"
+                            message = $sendRes.message
                         }
                     }
                 }
@@ -2447,6 +2547,7 @@ try {
                         id = $newId
                         customer_name = if ($bodyJson.customer_name) { $bodyJson.customer_name } elseif ($bodyJson.name) { $bodyJson.name } else { "Free Trial Applicant" }
                         email = if ($bodyJson.email) { $bodyJson.email } else { "" }
+                        phone = if ($bodyJson.phone) { [string]$bodyJson.phone } else { "" }
                         device_type = if ($bodyJson.device_type) { $bodyJson.device_type } else { "Smart TV" }
                         country = if ($bodyJson.country) { $bodyJson.country } else { "Global" }
                         message = if ($bodyJson.message) { $bodyJson.message } else { "" }

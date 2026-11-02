@@ -668,8 +668,21 @@
              ========================================== -->
         <div id="trials" class="scroll-mt-20"></div>
         <div id="tab-content-trials" class="admin-tab-content hidden space-y-4">
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-heading font-bold text-white">24H Free Trial Requests</h2>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-xl font-heading font-bold text-white">24H Free Trial Requests</h2>
+              <p class="text-xs text-slate-400">Assign test line credentials and dispatch directly to the customer via WhatsApp or Email.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" onclick="openTrialSettingsModal()" class="px-3.5 py-2 rounded-xl bg-emerald-600/15 hover:bg-emerald-600/25 border border-emerald-500/30 text-xs font-bold text-emerald-300 flex items-center gap-1.5 cursor-pointer">
+                <span>⚙️</span>
+                <span>Trial Delivery Settings</span>
+              </button>
+              <button type="button" onclick="openSMTPSettingsModal()" class="px-3.5 py-2 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] text-xs font-semibold text-sky-400 flex items-center gap-1.5 cursor-pointer">
+                <span>📬</span>
+                <span>Auto-Email (SMTP)</span>
+              </button>
+            </div>
           </div>
           <div class="glass-panel rounded-2xl border border-[#263247] overflow-hidden">
             <div class="overflow-x-auto">
@@ -677,11 +690,11 @@
                 <thead class="bg-[#0C111D]/90 text-slate-400 uppercase text-[10px] font-bold border-b border-[#263247]">
                   <tr>
                     <th class="p-3.5">Trial ID</th>
-                    <th class="p-3.5">Email</th>
+                    <th class="p-3.5">Email / WhatsApp</th>
                     <th class="p-3.5">Device</th>
-                    <th class="p-3.5">Notes / Request</th>
+                    <th class="p-3.5">Notes / Line</th>
                     <th class="p-3.5">Status</th>
-                    <th class="p-3.5 text-right">Action</th>
+                    <th class="p-3.5 text-right">Dispatch / Action</th>
                   </tr>
                 </thead>
                 <tbody id="trials-table-body" class="divide-y divide-slate-800/60 text-slate-300">
@@ -956,6 +969,14 @@
                   <div>
                     <span class="font-bold text-amber-400 block">🌐 IPTV Reseller Panel API (andy-pro.uk)</span>
                     <span class="text-slate-400 text-[11px]">Automate line creation, check credit balance & packages</span>
+                  </div>
+                  <span class="text-slate-400 font-bold">Configure →</span>
+                </button>
+
+                <button onclick="openTrialSettingsModal()" class="w-full py-3 px-4 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-[#263247] flex items-center justify-between text-xs cursor-pointer">
+                  <div>
+                    <span class="font-bold text-emerald-400 block">⚡ 24H Free Trial Delivery Settings</span>
+                    <span class="text-slate-400 text-[11px]">Set default Trial Server URL, duration label & WhatsApp/Email welcome message</span>
                   </div>
                   <span class="text-slate-400 font-bold">Configure →</span>
                 </button>
@@ -1402,7 +1423,7 @@
         <button onclick="copyDeliveryMessage()" class="btn-primary bg-blue-600 hover:bg-blue-500 text-white flex-1 py-2.5 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1.5">
           <span>Copy Message</span>
         </button>
-        <a id="btn-deliv-send-whatsapp" href="https://wa.me/447413469398" target="_blank" class="btn-whatsapp px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
+        <a id="btn-deliv-send-whatsapp" href="https://wa.me/447882507089" target="_blank" class="btn-whatsapp px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
           <span>Open WhatsApp</span> &rarr;
         </a>
         <button onclick="closeDeliveryModal()" class="px-3 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs">
@@ -2063,6 +2084,195 @@
         </div>
         <div id="iptv-panel-test-result" class="hidden text-[11px] p-2.5 rounded-xl border"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SEND 24H FREE TRIAL (WHATSAPP & EMAIL DISPATCH) -->
+  <div id="trial-send-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeTrialSendModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-2xl w-full p-6 sm:p-7 border border-emerald-500/40 shadow-2xl z-10 space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">⚡</span>
+          <div>
+            <h3 id="trial-send-title" class="font-heading font-bold text-lg text-white">Send 24H Free Trial</h3>
+            <p id="trial-send-request" class="text-[11px] text-slate-400">Enter or generate trial credentials below, then send via WhatsApp or Email.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="openTrialSettingsModal()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-slate-300 border border-slate-700 cursor-pointer" title="Trial Delivery Settings">
+            ⚙️ Settings
+          </button>
+          <button type="button" onclick="closeTrialSendModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close Send Trial Modal">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 1. Recipient Contact Info -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Customer Name</label>
+          <input type="text" id="trial-send-name" oninput="refreshTrialPreview()" placeholder="Customer Name" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-3 py-2 text-white">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Device</label>
+          <input type="text" id="trial-send-device" oninput="refreshTrialPreview()" placeholder="Smart TV / FireStick" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-3 py-2 text-white">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Customer Email</label>
+          <input type="email" id="trial-send-email" oninput="syncTrialDeliveryLinks()" placeholder="customer@example.com" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-3 py-2 text-white">
+        </div>
+        <div>
+          <label class="block font-semibold text-emerald-300 mb-1">Customer WhatsApp Number (with country code)</label>
+          <input type="tel" id="trial-send-phone" oninput="syncTrialDeliveryLinks()" placeholder="e.g. +447700900123 (or leave blank to pick contact)" class="w-full bg-[#0C111D] border border-emerald-500/30 rounded-xl px-3 py-2 text-white font-mono">
+        </div>
+      </div>
+
+      <!-- 2. Trial IPTV Credentials -->
+      <div class="p-3.5 rounded-2xl bg-[#0C111D] border border-[#263247] space-y-3 text-xs">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="font-bold text-white">🔐 Trial Line Credentials (Xtream / M3U)</span>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="generateTrialCredentials()" class="px-2.5 py-1 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-blue-300 font-bold text-[11px] cursor-pointer">
+              ⚡ Auto-Generate
+            </button>
+            <button type="button" onclick="provisionTrialFromPanel()" class="px-2.5 py-1 rounded-lg bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/40 text-amber-300 font-bold text-[11px] cursor-pointer" title="Create 24h Trial Line via IPTV Reseller Panel API">
+              🔌 Create on Panel
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Server Portal URL</label>
+            <input type="text" id="trial-send-server" oninput="refreshTrialPreview()" placeholder="http://line.lunaentertainment.online:8080" class="w-full bg-[#101522] border border-[#263247] rounded-lg px-2.5 py-2 text-white font-mono text-[11px]">
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Xtream Username *</label>
+            <input type="text" id="trial-send-username" oninput="refreshTrialPreview()" placeholder="Paste or click Auto-Generate" class="w-full bg-[#101522] border border-[#263247] rounded-lg px-2.5 py-2 text-emerald-300 font-mono font-bold">
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Xtream Password *</label>
+            <input type="text" id="trial-send-password" oninput="refreshTrialPreview()" placeholder="Paste or click Auto-Generate" class="w-full bg-[#101522] border border-[#263247] rounded-lg px-2.5 py-2 text-emerald-300 font-mono font-bold">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] text-slate-400 mb-1">M3U Playlist URL (auto-built from above, or paste custom)</label>
+          <input type="text" id="trial-send-m3u" oninput="this.dataset.auto='false'; refreshTrialPreview()" placeholder="http://.../get.php?username=...&password=...&type=m3u_plus&output=ts" class="w-full bg-[#101522] border border-[#263247] rounded-lg px-2.5 py-1.5 text-slate-300 font-mono text-[11px]">
+        </div>
+      </div>
+
+      <!-- 3. Editable Message Preview -->
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between text-xs">
+          <label class="font-semibold text-slate-300">📨 Ready-to-Send Trial Message (Editable)</label>
+          <button type="button" onclick="copyTrialMessage()" class="text-[11px] font-bold text-blue-400 hover:text-blue-300 cursor-pointer">📋 Copy Message</button>
+        </div>
+        <textarea id="trial-send-preview" rows="7" oninput="syncTrialDeliveryLinks()" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl p-3 text-xs text-emerald-300 font-mono focus:outline-none focus:border-emerald-500 leading-relaxed"></textarea>
+      </div>
+
+      <!-- 4. One-Click Delivery Buttons (WhatsApp + Gmail + Email App + Auto SMTP) -->
+      <div class="space-y-2.5 pt-1">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Choose How to Send Trial:</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <a id="btn-trial-send-whatsapp" href="https://wa.me/" target="_blank" rel="noopener" onclick="handleTrialChannelClick(event, 'WhatsApp')" class="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all">
+            <span>💬</span>
+            <span id="trial-send-wa-label">Send via WhatsApp</span>
+            <span>&rarr;</span>
+          </a>
+
+          <a id="btn-trial-send-gmail" href="https://mail.google.com/" target="_blank" rel="noopener" onclick="handleTrialChannelClick(event, 'Gmail')" class="py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 transition-all">
+            <span>📧</span>
+            <span>Send via Gmail (Web)</span>
+            <span>&rarr;</span>
+          </a>
+
+          <a id="btn-trial-send-mailto" href="mailto:" onclick="handleTrialChannelClick(event, 'Email App')" class="py-2.5 px-4 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-blue-500/30 text-blue-300 font-bold text-xs flex items-center justify-center gap-2 transition-all">
+            <span>✉️</span>
+            <span>Open Default Email App</span>
+          </a>
+
+          <button type="button" onclick="sendTrialByServerEmail()" class="py-2.5 px-4 rounded-xl bg-[#0C111D] hover:bg-slate-800 border border-sky-500/30 text-sky-300 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all">
+            <span>🚀</span>
+            <span>Send Automated SMTP Email</span>
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-[#263247]">
+          <button type="button" onclick="saveTrialOnly()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 cursor-pointer">
+            💾 Save Credentials Only
+          </button>
+          <button type="button" onclick="closeTrialSendModal()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white text-xs cursor-pointer">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: 24H TRIAL DELIVERY SETTINGS -->
+  <div id="trial-settings-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeTrialSettingsModal()"></div>
+    <div class="relative glass-card-glow bg-[#101522] rounded-3xl max-w-lg w-full p-6 sm:p-7 border border-emerald-500/40 shadow-2xl z-10 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[#263247]">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">⚙️</span>
+          <div>
+            <h3 class="font-heading font-bold text-lg text-white">24H Trial Delivery Settings</h3>
+            <p class="text-[11px] text-slate-400">Default server URL and message template used when sending trials via WhatsApp & Email.</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeTrialSettingsModal()" class="text-slate-400 hover:text-white p-1" aria-label="Close Trial Settings Modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="trial-settings-form" onsubmit="saveTrialSettings(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Default Trial Server Portal URL (Xtream Host)</label>
+          <input type="text" id="cfg-trial-server-url" required placeholder="http://line.lunaentertainment.online:8080" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-3.5 py-2.5 text-white font-mono">
+          <label class="flex items-center gap-2 mt-2 text-[11px] text-slate-400 cursor-pointer">
+            <input type="checkbox" id="cfg-trial-sync-m3u" checked class="accent-emerald-500 w-3.5 h-3.5">
+            <span>Also use this Server URL for new paid orders M3U template</span>
+          </label>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Trial Duration Label</label>
+            <input type="text" id="cfg-trial-duration" placeholder="24-Hour" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-3.5 py-2.5 text-white">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Your Support WhatsApp Number</label>
+            <input type="text" id="cfg-trial-support-wa" placeholder="447882507089" class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-3.5 py-2.5 text-white font-mono">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Extra App / Setup Instruction Note (Optional)</label>
+          <textarea id="cfg-trial-custom-note" rows="2" placeholder="e.g. Install IPTV Smarters Pro or TiviMate and log in using Xtream Codes API." class="w-full bg-[#0C111D] border border-[#263247] rounded-xl px-3.5 py-2 text-white"></textarea>
+        </div>
+
+        <div class="p-3 rounded-xl bg-sky-950/30 border border-sky-500/20 flex items-center justify-between gap-2">
+          <div class="text-[11px] text-slate-300">
+            Want automated 1-click server emails without opening Gmail?
+          </div>
+          <button type="button" onclick="closeTrialSettingsModal(); openSMTPSettingsModal();" class="px-2.5 py-1.5 rounded-lg bg-sky-600/20 hover:bg-sky-600/30 border border-sky-500/40 text-sky-300 font-bold text-[11px] whitespace-nowrap cursor-pointer">
+            📬 Setup SMTP
+          </button>
+        </div>
+
+        <div class="pt-2 flex gap-2">
+          <button type="submit" class="flex-1 py-2.5 rounded-xl font-bold text-white text-xs bg-emerald-600 hover:bg-emerald-500 cursor-pointer">
+            💾 Save Trial Settings
+          </button>
+          <button type="button" onclick="closeTrialSettingsModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-bold text-xs cursor-pointer">
+            Cancel
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
